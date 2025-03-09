@@ -1,0 +1,70 @@
+/* CSS file: public/assets/css/payment.css */
+.wc-credit-card-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.wc-credit-card-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.wc-credit-card-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.wc-credit-card-form input[type="tel"],
+.wc-credit-card-form input[type="text"],
+.wc-credit-card-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.wc-credit-card-form .form-row {
+    margin-bottom: 15px;
+}
+
+/* RTL Support */
+html[dir="rtl"] .wc-credit-card-form {
+    text-align: right;
+}
+
+/* Styling error messages */
+.woocommerce-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 15px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+/* Card input formatting */
+.wc-credit-card-form-card-number {
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 40px;
+}
+
+.wc-credit-card-form-card-number.visa {
+    background-image: url('/wp-content/plugins/AdPro-esim/public/assets/images/visa.svg');
+}
+
+.wc-credit-card-form-card-number.mastercard {
+    background-image: url('/wp-content/plugins/AdPro-esim/public/assets/images/mastercard.svg');
+}
+
+.wc-credit-card-form-card-number.amex {
+    background-image: url('/wp-content/plugins/AdPro-esim/public/assets/images/amex.svg');
+}
