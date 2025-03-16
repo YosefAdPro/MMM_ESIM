@@ -304,10 +304,10 @@ select:focus {
 
 .package {
     background-color: white;
-    border-radius: var(--border-radius);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: var(--box-shadow);
-    transition: var(--transition);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
     position: relative;
     cursor: pointer;
     display: flex;
@@ -318,6 +318,23 @@ select:focus {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
+
+/* עיצוב כותרת פשוטה יותר */
+.package-title {
+    padding: 15px;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+    background: linear-gradient(to left, #f8f9fa, #eaeaea);
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 .package h2 {
     padding: 15px;
@@ -640,6 +657,8 @@ select:focus {
     .country-header h1 {
         font-size: 1.8rem;
     }
+	
+	
     
     .packages-list {
         grid-template-columns: 1fr;
@@ -1055,4 +1074,45 @@ select:focus {
     padding: 6px 12px;
     font-size: 0.9rem;
     margin-right: 5px;
+}
+
+
+.data-validity {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.data-validity i {
+    color: #0066cc;
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+.data-validity strong {
+    color: #555;
+    min-width: 100px;
+}
+
+.network-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.network-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    background-color: #673ab7;
+    color: white;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.network-badge.network-4g {
+    background-color: #1976d2;
 }

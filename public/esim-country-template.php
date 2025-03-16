@@ -137,7 +137,14 @@ if ($country_data) {
 <!-- פילטר חבילות - קוד מעודכן עם סינון מחיר -->
 
     <div class="package-filters">
-        <h3>סינון חבילות</h3>
+<div class="package-filters">
+    <h3>סינון חבילות</h3>
+    
+    <!-- כפתור סינון למובייל -->
+    <button class="filter-mobile-toggle">פתח סינון מתקדם</button>
+    
+    <!-- תוכן הסינון -->
+    <div class="filter-content">
         <div class="filter-row">
             <div class="filter-group">
                 <label for="data-filter">כמות נתונים:</label>
@@ -172,6 +179,7 @@ if ($country_data) {
             <button id="reset-filters" class="reset-button">איפוס סינון</button>
         </div>
     </div>
+</div>
 <?php endif; ?>
 
         <?php if ($packages && !empty($packages)) : ?>
@@ -291,16 +299,14 @@ if (!empty($validity_days)) {
         <div class="networks-grid">
             <?php foreach ($country_networks as $network) : ?>
                 <div class="network-item">
-                    <span class="network-name"><?php echo esc_html($network['brand']); ?></span>
-                    <?php if (isset($network['is5G']) && $network['is5G']) : ?>
-                        <span class="network-technology network-5g">
-                            <i class="fas fa-wifi"></i> 5G
-                        </span>
-                    <?php elseif (isset($network['is4G']) && $network['is4G']) : ?>
-                        <span class="network-technology network-4g">
-                            <i class="fas fa-signal"></i> 4G
-                        </span>
-                    <?php endif; ?>
+                    <span class="network-name">
+                        <?php echo esc_html($network['brand']); ?>
+                        <?php if (isset($network['is5G']) && $network['is5G']) : ?>
+                            <span class="network-badge">5G</span>
+                        <?php elseif (isset($network['is4G']) && $network['is4G']) : ?>
+                            <span class="network-badge network-4g">4G</span>
+                        <?php endif; ?>
+                    </span>
                 </div>
             <?php endforeach; ?>
         </div>

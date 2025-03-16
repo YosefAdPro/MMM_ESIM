@@ -1,6 +1,17 @@
 jQuery(document).ready(function($) {
 	
-	
+
+$('.filter-mobile-toggle').on('click', function() {
+    $('.package-filters').toggleClass('filters-open');
+    
+    // שינוי טקסט הכפתור
+    if ($('.package-filters').hasClass('filters-open')) {
+        $(this).text('סגור סינון');
+    } else {
+        $(this).text('פתח סינון מתקדם');
+    }
+});
+
     // סינון חבילות
 
 if ($('.packages-list').length) {
