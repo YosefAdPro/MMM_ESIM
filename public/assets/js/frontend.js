@@ -243,19 +243,7 @@ if ($('.packages-list').length) {
             }
         }
         
-        modalContent += '<h2>' + packageTitle + '</h2>';
-        
-        // מידע כללי
-        modalContent += '<div class="modal-details">';
-        
-        // מידע בסיסי
-        modalContent += '<div class="details-section">';
-        modalContent += '<h4>פרטי חבילה</h4>';
-        
-        // מחיר
-        modalContent += '<p class="modal-price">' + packageDetails.retailPrice + ' ' + packageDetails.currencyCode + '</p>';
-        
-        // נתונים נוספים
+        // חילוץ נתוני חבילה רלוונטיים
         var dataLimit = '';
         var dataUnit = '';
         var validityDays = '';
@@ -278,6 +266,47 @@ if ($('.packages-list').length) {
             }
         }
         
+        // בניית כותרת מותאמת אישית - החלק החדש!
+        var customTitle = '';
+        var countriesCount = packageDetails.countries ? packageDetails.countries.length : 0;
+
+        // הוספת שם המדינה
+        if (hebrewCountry) {
+            customTitle += "חבילת גלישה ל" + hebrewCountry;
+            
+            // הוספת מספר מדינות נוספות אם יש יותר ממדינה אחת
+            if (countriesCount > 1) {
+                var additionalCountries = countriesCount - 1;
+                customTitle += " ועוד " + additionalCountries + " מדינות";
+            }
+        } else {
+            // כותרת עם רק מספר מדינות אם אין מדינה ספציפית
+            customTitle += "חבילת גלישה ל-" + countriesCount + " מדינות";
+        }
+
+        // הוספת נפח הנתונים
+        if (dataLimit && dataUnit) {
+            customTitle += " עם " + dataLimit + " " + dataUnit;
+        }
+
+        // הוספת תקופת התוקף
+        if (validityDays) {
+            customTitle += " למשך " + validityDays + " ימים";
+        }
+
+        modalContent += '<h2>' + customTitle + '</h2>';
+        
+        // מידע כללי
+        modalContent += '<div class="modal-details">';
+        
+        // מידע בסיסי
+        modalContent += '<div class="details-section">';
+        modalContent += '<h4>פרטי חבילה</h4>';
+        
+        // מחיר
+        modalContent += '<p class="modal-price">' + packageDetails.retailPrice + ' ' + packageDetails.currencyCode + '</p>';
+        
+        // נתונים נוספים
         if (dataLimit && dataUnit) {
             modalContent += '<p><strong>נתונים:</strong> ' + dataLimit + ' ' + dataUnit + '</p>';
         }
