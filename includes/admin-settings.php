@@ -66,9 +66,12 @@ function AdPro_esim_settings_init() {
     // קבוצת הגדרות API
     register_setting('AdPro_esim_api_settings', 'AdPro_api_key');
     register_setting('AdPro_esim_api_settings', 'AdPro_merchant_id');
+    
+    // הגדרות iCount
     register_setting('AdPro_esim_api_settings', 'AdPro_icount_company_id');
-	register_setting('AdPro_esim_api_settings', 'AdPro_icount_user');
-	register_setting('AdPro_esim_api_settings', 'AdPro_icount_pass');
+    register_setting('AdPro_esim_api_settings', 'AdPro_icount_user');
+    register_setting('AdPro_esim_api_settings', 'AdPro_icount_pass');
+    register_setting('AdPro_esim_api_settings', 'AdPro_icount_api_key');
     
     // קבוצת הגדרות מסחר
     register_setting('AdPro_esim_commerce_settings', 'AdPro_hidden_providers', [
@@ -124,30 +127,6 @@ function AdPro_esim_settings_init() {
         'AdPro-esim-settings',
         'AdPro_esim_api_section'
     );
-    
-add_settings_field(
-    'AdPro_icount_user_field',
-    'שם משתמש iCount',
-    'AdPro_icount_user_field_callback',
-    'AdPro-esim-settings',
-    'AdPro_esim_api_section'
-);
-
-add_settings_field(
-    'AdPro_icount_pass_field',
-    'סיסמת iCount',
-    'AdPro_icount_pass_field_callback',
-    'AdPro-esim-settings',
-    'AdPro_esim_api_section'
-);
-    
-    add_settings_field(
-        'AdPro_icount_company_id_field',
-        'מזהה חברה של iCount',
-        'AdPro_icount_company_id_field_callback',
-        'AdPro-esim-settings',
-        'AdPro_esim_api_section'
-    );
 }
 add_action('admin_init', 'AdPro_esim_settings_init');
 
@@ -155,7 +134,7 @@ add_action('admin_init', 'AdPro_esim_settings_init');
  * פונקציות callbacks לסקציות
  */
 function AdPro_esim_api_section_callback() {
-    echo '<p>הזן את פרטי ההתחברות ל-API של מובימטר ו-iCount.</p>';
+    echo '<p>הזן את פרטי ההתחברות ל-API של מובימטר.</p>';
     
     // בדיקת מפתח API
     $api_key = get_option('AdPro_api_key');
@@ -189,22 +168,59 @@ function AdPro_merchant_id_field_callback() {
     echo "<p class='description'>מזהה הסוחר מסופק על ידי מובימטר.</p>";
 }
 
-function AdPro_icount_user_field_callback() {
-    $user = get_option('AdPro_icount_user');
-    echo "<input type='text' name='AdPro_icount_user' value='" . esc_attr($user) . "' class='regular-text'>";
-    echo "<p class='description'>שם המשתמש של חשבון iCount.</p>";
-}
-
-function AdPro_icount_pass_field_callback() {
-    $pass = get_option('AdPro_icount_pass');
-    echo "<input type='password' name='AdPro_icount_pass' value='" . esc_attr($pass) . "' class='regular-text'>";
-    echo "<p class='description'>הסיסמה של חשבון iCount.</p>";
-}
-
-function AdPro_icount_company_id_field_callback() {
-    $company_id = get_option('AdPro_icount_company_id');
-    echo "<input type='text' name='AdPro_icount_company_id' value='" . esc_attr($company_id) . "' class='regular-text'>";
-    echo "<p class='description'>מזהה החברה מסופק על ידי iCount.</p>";
+/**
+ * הוספת שדות הגדרות לתוסף iCount רשמי
+ */
+function AdPro_add_icount_api_settings_section() {
+    echo '<h2>הגדרות iCount</h2>';
+    echo '<p>הגדרות אלו משמשות לתמיכה באינטגרציה עם תוסף iCount הרשמי.</p>';
+    
+    // האם התוסף הרשמי של iCount מותקן?
+    $icount_plugin = 'icount-payment-gateway/icount-payment-gateway.php'; // התאם לשם האמיתי
+    if (is_plugin_active($icount_plugin)) {
+        echo '<div class="notice notice-success inline"><p>תוסף iCount הרשמי מותקן ופעיל.</p></div>';
+        
+        // האם הגדרות התוסף הרשמי מוגדרות כראוי?
+        // כאן יש להתאים את הבדיקה לפי הגדרות התוסף הרשמי
+        if (get_option('woocommerce_icount_settings') || get_option('icount_api_key')) {
+            echo '<div class="notice notice-info inline"><p>נראה שהגדרות iCount כבר מוגדרות בתוסף הרשמי.</p></div>';
+        } else {
+            echo '<div class="notice notice-warning inline"><p>אנא הגדר את תוסף iCount הרשמי בהגדרות וווקומרס > תשלומים.</p></div>';
+        }
+    } else {
+        echo '<div class="notice notice-warning inline"><p>תוסף iCount הרשמי אינו מותקן. <a href="' . admin_url('plugin-install.php?s=icount&tab=search&type=term') . '">התקן עכשיו</a>.</p></div>';
+    }
+    
+    // בכל מקרה, הצג את הגדרות ה-API כגיבוי
+    ?>
+    <table class="form-table">
+        <tr>
+            <th scope="row">מפתח API של iCount:</th>
+            <td>
+                <input type="text" name="AdPro_icount_api_key" value="<?php echo esc_attr(get_option('AdPro_icount_api_key', '')); ?>" class="regular-text">
+                <p class="description">מפתח ה-API זהה לזה שהוגדר בתוסף הרשמי אם מותקן.</p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">מזהה חברה:</th>
+            <td>
+                <input type="text" name="AdPro_icount_company_id" value="<?php echo esc_attr(get_option('AdPro_icount_company_id', '')); ?>" class="regular-text">
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">שם משתמש:</th>
+            <td>
+                <input type="text" name="AdPro_icount_user" value="<?php echo esc_attr(get_option('AdPro_icount_user', '')); ?>" class="regular-text">
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">סיסמה:</th>
+            <td>
+                <input type="password" name="AdPro_icount_pass" value="<?php echo esc_attr(get_option('AdPro_icount_pass', '')); ?>" class="regular-text">
+            </td>
+        </tr>
+    </table>
+    <?php
 }
 
 /**
@@ -218,13 +234,54 @@ function AdPro_esim_settings_page() {
     }
     
     ?>
+	
+	
+	
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+         <?php
+        // הצגת תאריך עדכון אחרון של חבילות
+        $last_update = get_option('adpro_packages_last_update');
+        if ($last_update) {
+            $last_update_date = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $last_update);
+            ?>
+            <div class="notice notice-info inline">
+                <p>
+                    <strong>עדכון חבילות אחרון:</strong> <?php echo esc_html($last_update_date); ?>
+                    <?php
+                    // חישוב זמן שחלף
+                    $time_diff = time() - $last_update;
+                    $hours_diff = round($time_diff / 3600);
+                    
+                    if ($hours_diff < 24) {
+                        echo ' <span style="color: green;">(לפני ' . esc_html($hours_diff) . ' שעות)</span>';
+                    } else {
+                        $days_diff = round($hours_diff / 24);
+                        echo ' <span style="color: ' . ($days_diff > 2 ? 'red' : 'orange') . '">(לפני ' . esc_html($days_diff) . ' ימים)</span>';
+                    }
+                    ?>
+                </p>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div class="notice notice-warning inline">
+                <p>לא נמצא תיעוד של עדכון חבילות. ייתכן שה-CRON טרם הופעל.</p>
+            </div>
+            <?php
+        }
+        ?>
         
         <form method="post" action="options.php">
             <?php
+			
+
             settings_fields('AdPro_esim_api_settings');
             do_settings_sections('AdPro-esim-settings');
+            
+            // הוסף הגדרות iCount
+            AdPro_add_icount_api_settings_section();
+            
             submit_button('שמור הגדרות');
             ?>
         </form>
@@ -249,129 +306,65 @@ function AdPro_esim_settings_page() {
         
         <h2>בדיקת חיבור iCount</h2>
         <p>
-            <a href="#" id="test-icount-api" class="button">בדוק חיבור ל-API של iCount</a>
-            <span id="icount-test-result"></span>
+            <a href="#" id="test-icount-integration" class="button">בדוק חיבור לתוסף iCount הרשמי</a>
+            <span id="icount-integration-test-result"></span>
         </p>
         
-<script>
-    jQuery(document).ready(function($) {
-        // סקריפט לבדיקת חיבור למובימטר - נשאר כפי שהיה
-        $('#test-mobimatter-api').on('click', function(e) {
-            e.preventDefault();
-            var $result = $('#api-test-result');
-            
-            $result.html('<span style="color: #aaa;">בודק חיבור...</span>');
-            
-            $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'AdPro_test_mobimatter_api'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $result.html('<span style="color: green;">✓ החיבור תקין!</span>');
-                    } else {
-                        $result.html('<span style="color: red;">✗ שגיאה: ' + response.data + '</span>');
-                    }
-                },
-                error: function() {
-                    $result.html('<span style="color: red;">✗ שגיאה בבדיקה</span>');
-                }
-            });
-        });
-        
-        // סקריפט משופר לבדיקת חיבור ל-iCount
-        $('#test-icount-api').on('click', function(e) {
-            e.preventDefault();
-            var $result = $('#icount-test-result');
-            var $debugInfo = $('#icount-debug-info');
-            
-            $result.html('<span style="color: #aaa;">בודק חיבור...</span>');
-            
-            // מחיקת מידע דיבאג קודם אם קיים
-            if ($debugInfo.length) {
-                $debugInfo.remove();
-            }
-            
-            $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'AdPro_test_icount_api'
-                },
-                success: function(response) {
-                    // בדיקה אם התשובה מכילה אובייקט או מחרוזת
-                    var message = '';
-                    var debugData = null;
+        <script>
+            jQuery(document).ready(function($) {
+                // סקריפט לבדיקת חיבור למובימטר
+                $('#test-mobimatter-api').on('click', function(e) {
+                    e.preventDefault();
+                    var $result = $('#api-test-result');
                     
-                    if (typeof response.data === 'object' && response.data !== null) {
-                        message = response.data.message || '';
-                        debugData = response.data.debug;
-                    } else {
-                        message = response.data || '';
-                    }
+                    $result.html('<span style="color: #aaa;">בודק חיבור...</span>');
                     
-                    if (response.success) {
-                        $result.html('<span style="color: green;">✓ ' + message + '</span>');
-                    } else {
-                        $result.html('<span style="color: red;">✗ שגיאה: ' + message + '</span>');
-                    }
-                    
-                    // הצגת מידע דיבאג אם קיים
-                    if (debugData) {
-                        var $debugDiv = $('<div id="icount-debug-info" style="margin-top: 15px; padding: 10px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; max-height: 400px; overflow: auto;"></div>');
-                        
-                        var debugHtml = '<h4 style="margin-top: 0;">פרטי דיבאג:</h4>';
-                        
-                        // בקשה
-                        if (debugData.request) {
-                            debugHtml += '<h5>בקשה:</h5>';
-                            debugHtml += '<pre style="background-color: #fff; padding: 10px; border-radius: 4px; overflow: auto; max-height: 150px;">' + 
-                                        JSON.stringify(debugData.request, null, 2) + 
-                                        '</pre>';
-                        }
-                        
-                        // פרטי cURL
-                        if (debugData.curl_info) {
-                            debugHtml += '<h5>פרטי cURL:</h5>';
-                            debugHtml += '<pre style="background-color: #fff; padding: 10px; border-radius: 4px; overflow: auto; max-height: 150px;">' + 
-                                        JSON.stringify(debugData.curl_info, null, 2) + 
-                                        '</pre>';
-                        }
-                        
-                        // תגובה
-                        if (debugData.response) {
-                            debugHtml += '<h5>תגובה:</h5>';
-                            debugHtml += '<pre style="background-color: #fff; padding: 10px; border-radius: 4px; overflow: auto; max-height: 150px;">' + 
-                                        JSON.stringify(debugData.response, null, 2) + 
-                                        '</pre>';
-                            
-                            // אם יש גוף תגובה לא מפוענח, מציג אותו כטקסט גולמי
-                            if (debugData.response.body_raw) {
-                                debugHtml += '<h5>תגובה גולמית:</h5>';
-                                debugHtml += '<pre style="background-color: #fff; padding: 10px; border-radius: 4px; overflow: auto; max-height: 150px;">' + 
-                                            debugData.response.body_raw + 
-                                            '</pre>';
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'AdPro_test_mobimatter_api'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $result.html('<span style="color: green;">✓ החיבור תקין!</span>');
+                            } else {
+                                $result.html('<span style="color: red;">✗ שגיאה: ' + response.data + '</span>');
                             }
+                        },
+                        error: function() {
+                            $result.html('<span style="color: red;">✗ שגיאה בבדיקה</span>');
                         }
-                        
-                        $debugDiv.html(debugHtml);
-                        $result.after($debugDiv);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    $result.html('<span style="color: red;">✗ שגיאה בבדיקה: ' + error + '</span>');
+                    });
+                });
+                
+                // סקריפט לבדיקת חיבור ל-iCount
+                $('#test-icount-integration').on('click', function(e) {
+                    e.preventDefault();
+                    var $result = $('#icount-integration-test-result');
                     
-                    // הצגת פרטי השגיאה
-                    var $debugDiv = $('<div id="icount-debug-info" style="margin-top: 15px; padding: 10px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;"></div>');
-                    $debugDiv.html('<h4 style="margin-top: 0;">פרטי שגיאה:</h4><pre>' + JSON.stringify({xhr: xhr.status, status: status, error: error}, null, 2) + '</pre>');
-                    $result.after($debugDiv);
-                }
+                    $result.html('<span style="color: #aaa;">בודק חיבור...</span>');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'AdPro_test_icount_api_integration'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $result.html('<span style="color: green;">✓ ' + response.data + '</span>');
+                            } else {
+                                $result.html('<span style="color: red;">✗ שגיאה: ' + response.data + '</span>');
+                            }
+                        },
+                        error: function() {
+                            $result.html('<span style="color: red;">✗ שגיאה בבדיקה</span>');
+                        }
+                    });
+                });
             });
-        });
-    });
-</script>
+        </script>
     </div>
     <?php
 }
@@ -422,131 +415,99 @@ function AdPro_test_mobimatter_api_callback() {
 add_action('wp_ajax_AdPro_test_mobimatter_api', 'AdPro_test_mobimatter_api_callback');
 
 /**
- * AJAX לבדיקת חיבור לשרת iCount
+ * בדיקת חיבור לתוסף iCount הרשמי
  */
-/**
- * AJAX לבדיקת חיבור לשרת iCount
- */
-/**
- * AJAX לבדיקת חיבור לשרת iCount
- */
-function AdPro_test_icount_api_callback() {
-    // קבלת פרטי ההתחברות מההגדרות
-    $company_id = get_option('AdPro_icount_company_id');
-    $user = get_option('AdPro_icount_user');
-    $pass = get_option('AdPro_icount_pass');
+function AdPro_test_icount_api_integration() {
+    // בדיקה אם התוסף הרשמי של iCount מותקן
+    $icount_plugin = 'icount-payment-gateway/icount-payment-gateway.php'; // התאם לשם האמיתי
+    
+    if (!is_plugin_active($icount_plugin)) {
+        wp_send_json_error('תוסף iCount הרשמי אינו מותקן.');
+        return;
+    }
+    
+    // בדיקה אם הגדרות התוסף הרשמי מוגדרות
+    $icount_settings = get_option('woocommerce_icount_settings'); // התאם לשם האמיתי של ההגדרות
+    
+    if (!$icount_settings || empty($icount_settings['api_key'])) {
+        // נסה לבדוק הגדרות חלופיות
+        $api_key = get_option('icount_api_key') ?: get_option('AdPro_icount_api_key');
+        
+        if (empty($api_key)) {
+            wp_send_json_error('הגדרות iCount חסרות. אנא הגדר את התוסף הרשמי.');
+            return;
+        }
+    }
+    
+    // בדיקת חיבור לשרת iCount באמצעות פונקציית API מתוסף רשמי
+    // כאן יש להתאים לפי הפונקציות הזמינות בתוסף הרשמי
+    
+    if (function_exists('icount_test_api_connection')) {
+        $result = icount_test_api_connection();
+        
+        if ($result === true || (is_array($result) && isset($result['success']) && $result['success'])) {
+            wp_send_json_success('החיבור ל-iCount נבדק בהצלחה! התוסף הרשמי מוגדר כראוי.');
+        } else {
+            $error_message = is_string($result) ? $result : 'שגיאה לא ידועה בחיבור.';
+            if (is_array($result) && isset($result['message'])) {
+                $error_message = $result['message'];
+            }
+            wp_send_json_error('שגיאה בחיבור ל-iCount: ' . $error_message);
+        }
+        return;
+    }
+    
+    // אם אין פונקציית בדיקה זמינה, נסה לבדוק ידנית
+    // יש להתאים את הלוגיקה לפי API של iCount
+    $company_id = $icount_settings['company_id'] ?? get_option('AdPro_icount_company_id');
+    $user = $icount_settings['username'] ?? get_option('AdPro_icount_user');
+    $pass = $icount_settings['password'] ?? get_option('AdPro_icount_pass');
     
     if (empty($company_id) || empty($user) || empty($pass)) {
-        wp_send_json_error('חסרים פרטי התחברות. יש להזין מזהה חברה, שם משתמש וסיסמה.');
+        wp_send_json_error('חסרים פרטי התחברות ל-iCount. בדוק הגדרות.');
         return;
     }
     
-    // בניית נתוני הבקשה לפי הפורמט הנכון
+    // בניית בקשת בדיקה בסיסית - יש להתאים לפי API של iCount
     $api_url = 'https://api.icount.co.il/api/v3.php/auth/login';
     
-    // שימוש ב-cURL במקום wp_remote_post
-    $curl = curl_init();
-    
-    // בניית המידע לדיבאג (מסתיר את הסיסמה)
-    $debug_info = [
-        'request' => [
-            'url' => $api_url,
-            'method' => 'POST',
-            'body' => [
-                'cid' => $company_id,
-                'user' => $user,
-                'pass' => '***חסוי***',
-                'otp' => ''  // חלק מפרוטוקול האימות אם צריך
-            ]
-        ],
-        'response' => null
+    $request_data = [
+        'cid' => $company_id,
+        'user' => $user,
+        'pass' => $pass,
+        'otp' => '' // חלק מפרוטוקול האימות אם צריך
     ];
     
-    // הגדרת אפשרויות cURL
-    curl_setopt_array($curl, [
-        CURLOPT_URL => $api_url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => [
-            'cid' => $company_id,
-            'user' => $user,
-            'pass' => $pass,
-            'otp' => ''  // התיעוד מציין פרמטר זה, אבל ניתן לו ערך ריק
-        ]
+    $response = wp_remote_post($api_url, [
+        'body' => $request_data,
+        'timeout' => 30
     ]);
     
-    // ביצוע הבקשה
-    $response_body = curl_exec($curl);
-    $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    $error = curl_error($curl);
-    
-    // שמירת הנתונים לדיבאג
-    $debug_info['curl_info'] = [
-        'error' => $error,
-        'response_code' => $response_code
-    ];
-    
-    // בדיקה אם הייתה שגיאה ב-cURL
-    if ($error) {
-        curl_close($curl);
-        wp_send_json_error([
-            'message' => 'שגיאת חיבור cURL: ' . $error,
-            'debug' => $debug_info
-        ]);
+    if (is_wp_error($response)) {
+        wp_send_json_error('שגיאת חיבור: ' . $response->get_error_message());
         return;
     }
     
-    // ניסיון לפרש את התגובה כ-JSON
-    $data = json_decode($response_body, true);
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    $response_data = json_decode($response_body, true);
     
-    // שמירת נתוני התגובה לדיבאג
-    $debug_info['response'] = [
-        'code' => $response_code,
-        'body_raw' => $response_body,
-        'body_parsed' => $data
-    ];
-    
-    // סגירת החיבור
-    curl_close($curl);
-    
-    // נוסיף לוג לדיבאג
-    error_log('iCount API request: ' . json_encode($debug_info['request']));
-    error_log('iCount API response: ' . json_encode($debug_info['response']));
-    
-    // בדיקה אם התגובה תקינה
     if ($response_code !== 200) {
-        $error_message = 'קוד שגיאה: ' . $response_code;
-        wp_send_json_error([
-            'message' => $error_message,
-            'debug' => $debug_info
-        ]);
+        $error_message = isset($response_data['reason']) ? $response_data['reason'] : 'קוד שגיאה: ' . $response_code;
+        wp_send_json_error('שגיאה בתגובת השרת: ' . $error_message);
         return;
     }
     
-    // בדיקת תגובה מוצלחת לפי שדה status ו-sid
-    if (isset($data['status']) && $data['status'] === true && isset($data['sid'])) {
-        // התחברות הצליחה
-        wp_send_json_success([
-            'message' => 'החיבור בוצע בהצלחה',
-            'debug' => $debug_info
-        ]);
-        return;
+    if (isset($response_data['status']) && $response_data['status'] === true) {
+        wp_send_json_success('החיבור ל-iCount בוצע בהצלחה!');
     } else {
-        // התחברות נכשלה, בדיקה אם יש הודעת שגיאה
-        $error_message = isset($data['reason']) ? $data['reason'] : 'שגיאה לא ידועה בהתחברות';
-        wp_send_json_error([
-            'message' => $error_message,
-            'debug' => $debug_info
-        ]);
-        return;
+        $error_message = isset($response_data['reason']) ? $response_data['reason'] : 'שגיאה לא ידועה';
+        wp_send_json_error('שגיאה באימות: ' . $error_message);
     }
 }
-add_action('wp_ajax_AdPro_test_icount_api', 'AdPro_test_icount_api_callback');
+
+// הוסף את פונקציית הבדיקה לאג'קס
+add_action('wp_ajax_AdPro_test_icount_api_integration', 'AdPro_test_icount_api_integration');
 
 /**
  * דף ניהול תוכן מדינות
@@ -921,43 +882,78 @@ function AdPro_esim_stats_page() {
     // חישוב סטטיסטיקות מכירה ונתונים על חבילות eSIM
     global $wpdb;
     
-    // קבלת נתוני הזמנות
+    // קבלת כל הנתונים של הזמנות eSIM שהושלמו
     $orders_query = "
         SELECT 
             p.ID as order_id,
             p.post_date as order_date,
+            p.post_status as order_status,
+            wc_om1.meta_value as customer_email,
+            wc_om2.meta_value as customer_name,
             oim.meta_value as esim_country,
-            om.meta_value as order_total
+            oim2.meta_value as esim_package_id,
+            oim3.meta_value as esim_data_limit,
+            oim4.meta_value as esim_data_unit,
+            oim5.meta_value as esim_validity_days,
+            om.meta_value as order_total,
+            om2.meta_value as mobimatter_order_id,
+            om3.meta_value as esim_activation_code
         FROM 
             {$wpdb->posts} p
         JOIN 
-            {$wpdb->postmeta} om ON p.ID = om.post_id
+            {$wpdb->postmeta} om ON p.ID = om.post_id AND om.meta_key = '_order_total'
+        LEFT JOIN 
+            {$wpdb->postmeta} om2 ON p.ID = om2.post_id AND om2.meta_key = '_mobimatter_order_id'
+        LEFT JOIN 
+            {$wpdb->postmeta} om3 ON p.ID = om3.post_id AND om3.meta_key = '_esim_activation_code'
+        LEFT JOIN 
+            {$wpdb->postmeta} wc_om1 ON p.ID = wc_om1.post_id AND wc_om1.meta_key = '_billing_email'
+        LEFT JOIN 
+            {$wpdb->postmeta} wc_om2 ON p.ID = wc_om2.post_id AND wc_om2.meta_key = '_billing_first_name'
         JOIN 
             {$wpdb->prefix}woocommerce_order_items oi ON p.ID = oi.order_id
         JOIN 
-            {$wpdb->prefix}woocommerce_order_itemmeta oim ON oi.order_item_id = oim.order_item_id
+            {$wpdb->prefix}woocommerce_order_itemmeta oim ON oi.order_item_id = oim.order_item_id AND oim.meta_key = 'esim_country'
+        LEFT JOIN 
+            {$wpdb->prefix}woocommerce_order_itemmeta oim2 ON oi.order_item_id = oim2.order_item_id AND oim2.meta_key = 'esim_package_id'
+        LEFT JOIN 
+            {$wpdb->prefix}woocommerce_order_itemmeta oim3 ON oi.order_item_id = oim3.order_item_id AND oim3.meta_key = 'esim_data_limit'
+        LEFT JOIN 
+            {$wpdb->prefix}woocommerce_order_itemmeta oim4 ON oi.order_item_id = oim4.order_item_id AND oim4.meta_key = 'esim_data_unit'
+        LEFT JOIN 
+            {$wpdb->prefix}woocommerce_order_itemmeta oim5 ON oi.order_item_id = oim5.order_item_id AND oim5.meta_key = 'esim_validity_days'
         WHERE 
             p.post_type = 'shop_order'
-            AND p.post_status = 'wc-completed'
-            AND om.meta_key = '_order_total'
-            AND oim.meta_key = 'esim_country'
+            AND (p.post_status = 'wc-completed' OR p.post_status = 'wc-processing')
         ORDER BY
             p.post_date DESC
     ";
     
     $orders = $wpdb->get_results($orders_query);
     
-    // ארגון נתונים לפי מדינות
+    // ארגון נתונים לפי מדינות ותאריכים
     $countries_stats = [];
+    $monthly_stats = [];
     $total_revenue = 0;
     $total_orders = 0;
+    $data_volumes = [];
     
     foreach ($orders as $order) {
         $country = $order->esim_country;
         $revenue = floatval($order->order_total);
+        $month = date('Y-m', strtotime($order->order_date));
+        $data_limit = $order->esim_data_limit ? $order->esim_data_limit : '0';
+        $data_unit = $order->esim_data_unit ? $order->esim_data_unit : 'GB';
+        
+        $data_volumes[] = [
+            'limit' => $data_limit,
+            'unit' => $data_unit
+        ];
+        
         $total_revenue += $revenue;
         $total_orders++;
         
+        // סטטיסטיקות לפי מדינה
         if (!isset($countries_stats[$country])) {
             $countries_stats[$country] = [
                 'orders' => 0,
@@ -967,12 +963,27 @@ function AdPro_esim_stats_page() {
         
         $countries_stats[$country]['orders']++;
         $countries_stats[$country]['revenue'] += $revenue;
+        
+        // סטטיסטיקות לפי חודש
+        if (!isset($monthly_stats[$month])) {
+            $monthly_stats[$month] = [
+                'orders' => 0,
+                'revenue' => 0
+            ];
+        }
+        
+        $monthly_stats[$month]['orders']++;
+        $monthly_stats[$month]['revenue'] += $revenue;
     }
     
     // מיון לפי הכנסות (מהגבוה לנמוך)
     uasort($countries_stats, function($a, $b) {
         return $b['revenue'] <=> $a['revenue'];
     });
+    
+    // מיון לפי תאריך (מהחדש לישן)
+    ksort($monthly_stats);
+    $monthly_stats = array_reverse($monthly_stats, true);
     
     ?>
     <div class="wrap">
@@ -996,9 +1007,42 @@ function AdPro_esim_stats_page() {
                 </div>
             </div>
             
+            <?php if (!empty($monthly_stats)) : ?>
+                <div class="stats-details">
+                    <h2>מכירות לפי חודש</h2>
+                    
+                    <div class="stats-chart">
+                        <canvas id="monthlyRevenueChart" height="100"></canvas>
+                    </div>
+                    
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th>חודש</th>
+                                <th>הזמנות</th>
+                                <th>הכנסות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($monthly_stats as $month => $stats) : ?>
+                                <tr>
+                                    <td><?php echo date_i18n('F Y', strtotime($month . '-01')); ?></td>
+                                    <td><?php echo $stats['orders']; ?></td>
+                                    <td>₪<?php echo number_format($stats['revenue'], 2); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+            
             <?php if (!empty($countries_stats)) : ?>
                 <div class="stats-details">
                     <h2>סטטיסטיקות לפי מדינה</h2>
+                    
+                    <div class="stats-chart">
+                        <canvas id="countriesRevenueChart" height="200"></canvas>
+                    </div>
                     
                     <table class="wp-list-table widefat fixed striped">
                         <thead>
@@ -1010,9 +1054,24 @@ function AdPro_esim_stats_page() {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($countries_stats as $country => $stats) : ?>
+                            <?php foreach ($countries_stats as $country => $stats) : 
+                                $country_iso = '';
+                                // חיפוש קוד ISO של המדינה
+                                $countries_mapping = AdPro_get_countries_mapping();
+                                foreach ($countries_mapping as $hebrew => $data) {
+                                    if ($hebrew === $country) {
+                                        $country_iso = strtolower($data['iso']);
+                                        break;
+                                    }
+                                }
+                            ?>
                                 <tr>
-                                    <td><?php echo esc_html($country); ?></td>
+                                    <td>
+                                        <?php if ($country_iso) : ?>
+                                            <img src="https://flagcdn.com/16x12/<?php echo $country_iso; ?>.png" alt="<?php echo esc_attr($country); ?>" style="vertical-align: middle; margin-left: 5px;"> 
+                                        <?php endif; ?>
+                                        <?php echo esc_html($country); ?>
+                                    </td>
                                     <td><?php echo $stats['orders']; ?></td>
                                     <td>₪<?php echo number_format($stats['revenue'], 2); ?></td>
                                     <td>₪<?php echo number_format($stats['revenue'] / $stats['orders'], 2); ?></td>
@@ -1021,11 +1080,101 @@ function AdPro_esim_stats_page() {
                         </tbody>
                     </table>
                 </div>
-            <?php else : ?>
-                <div class="notice notice-info">
-                    <p>אין עדיין נתוני מכירות.</p>
-                </div>
             <?php endif; ?>
+            
+            <div class="stats-details">
+                <h2>פירוט הזמנות eSIM</h2>
+                
+                <?php if (!empty($orders)) : ?>
+                    <div class="tablenav top">
+                        <div class="alignleft actions">
+                            <input type="text" id="orderSearch" placeholder="חיפוש..." class="regular-text">
+                        </div>
+                        <div class="alignright">
+                            <button id="exportOrders" class="button">ייצוא לאקסל</button>
+                        </div>
+                        <br class="clear">
+                    </div>
+                
+                    <table class="wp-list-table widefat fixed striped orders-table">
+                        <thead>
+                            <tr>
+                                <th>מס' הזמנה</th>
+                                <th>תאריך</th>
+                                <th>לקוח</th>
+                                <th>מדינה</th>
+                                <th>חבילה</th>
+                                <th>נפח גלישה</th>
+                                <th>תוקף</th>
+                                <th>קוד הפעלה</th>
+                                <th>סכום</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($orders as $order) : 
+                                $order_status_label = '';
+                                switch ($order->order_status) {
+                                    case 'wc-completed':
+                                        $order_status_label = '<span class="status-completed">הושלם</span>';
+                                        break;
+                                    case 'wc-processing':
+                                        $order_status_label = '<span class="status-processing">בביצוע</span>';
+                                        break;
+                                    default:
+                                        $order_status_label = $order->order_status;
+                                }
+                            ?>
+                                <tr data-order-id="<?php echo esc_attr($order->order_id); ?>">
+                                    <td>
+                                        <?php echo $order->order_id; ?>
+                                        <div class="row-actions">
+                                            <span><a href="<?php echo admin_url('post.php?post=' . $order->order_id . '&action=edit'); ?>">צפה</a></span>
+                                        </div>
+                                    </td>
+                                    <td><?php echo date_i18n('d/m/Y H:i', strtotime($order->order_date)); ?></td>
+                                    <td>
+                                        <?php echo esc_html($order->customer_name); ?>
+                                        <div class="row-actions">
+                                            <span><a href="mailto:<?php echo esc_attr($order->customer_email); ?>"><?php echo esc_html($order->customer_email); ?></a></span>
+                                        </div>
+                                    </td>
+                                    <td><?php echo esc_html($order->esim_country); ?></td>
+                                    <td><?php echo esc_html($order->esim_package_id); ?></td>
+                                    <td><?php echo $order->esim_data_limit ? esc_html($order->esim_data_limit . ' ' . $order->esim_data_unit) : '-'; ?></td>
+                                    <td><?php echo $order->esim_validity_days ? esc_html($order->esim_validity_days . ' ימים') : '-'; ?></td>
+                                    <td><?php echo esc_html($order->esim_activation_code); ?></td>
+                                    <td>₪<?php echo number_format(floatval($order->order_total), 2); ?></td>
+                                    <td>
+                                        <a href="#" class="button view-esim-details" data-order-id="<?php echo esc_attr($order->order_id); ?>">פרטי eSIM</a>
+                                        <a href="#" class="button view-esim-usage" data-mobimatter-id="<?php echo esc_attr($order->mobimatter_order_id); ?>">נתוני שימוש</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    
+                    <div id="esim-details-modal" class="esim-modal">
+                        <div class="esim-modal-content">
+                            <span class="esim-modal-close">×</span>
+                            <h2>פרטי ה-eSIM</h2>
+                            <div id="esim-details-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="esim-usage-modal" class="esim-modal">
+                        <div class="esim-modal-content">
+                            <span class="esim-modal-close">×</span>
+                            <h2>נתוני שימוש</h2>
+                            <div id="esim-usage-content"></div>
+                        </div>
+                    </div>
+                <?php else : ?>
+                    <div class="notice notice-info">
+                        <p>אין עדיין נתוני מכירות.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
     
@@ -1043,9 +1192,9 @@ function AdPro_esim_stats_page() {
         .stat-card {
             flex: 1;
             background: white;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
         }
         
@@ -1053,23 +1202,96 @@ function AdPro_esim_stats_page() {
             margin-top: 0;
             color: #555;
             font-weight: normal;
+            font-size: 14px;
         }
         
         .stat-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #333;
+            margin-top: 10px;
         }
         
         .stats-details {
             background: white;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
         
         .stats-details h2 {
             margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 18px;
+        }
+        
+        .stats-chart {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+        
+        .status-completed {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .status-processing {
+            display: inline-block;
+            background-color: #2196F3;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .orders-table td {
+            vertical-align: middle;
+        }
+        
+        /* מודלים */
+        .esim-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .esim-modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 700px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .esim-modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .esim-modal-close:hover {
+            color: black;
         }
         
         @media (max-width: 768px) {
@@ -1078,5 +1300,209 @@ function AdPro_esim_stats_page() {
             }
         }
     </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+    jQuery(document).ready(function($) {
+        // חיפוש הזמנות
+        $('#orderSearch').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('.orders-table tbody tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+        
+        // צפייה בפרטי eSIM
+        $('.view-esim-details').on('click', function(e) {
+            e.preventDefault();
+            var orderId = $(this).data('order-id');
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'adpro_get_esim_details',
+                    order_id: orderId,
+                    nonce: '<?php echo wp_create_nonce('adpro_admin_esim_details'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#esim-details-content').html(response.data);
+                        $('#esim-details-modal').show();
+                    } else {
+                        alert('שגיאה: ' + response.data);
+                    }
+                }
+            });
+        });
+        
+        // צפייה בנתוני שימוש
+        $('.view-esim-usage').on('click', function(e) {
+            e.preventDefault();
+            var mobimatterId = $(this).data('mobimatter-id');
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'adpro_get_esim_usage',
+                    mobimatter_id: mobimatterId,
+                    nonce: '<?php echo wp_create_nonce('adpro_admin_esim_usage'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#esim-usage-content').html(response.data);
+                        $('#esim-usage-modal').show();
+                    } else {
+                        alert('שגיאה: ' + response.data);
+                    }
+                }
+            });
+        });
+        
+        // סגירת מודלים
+        $('.esim-modal-close').on('click', function() {
+            $('.esim-modal').hide();
+        });
+        
+        // סגירת מודל בלחיצה מחוץ לתוכן
+        $(window).on('click', function(e) {
+            if ($(e.target).hasClass('esim-modal')) {
+                $('.esim-modal').hide();
+            }
+        });
+        
+        // ייצוא לאקסל
+        $('#exportOrders').on('click', function() {
+            // יצירת טבלת אקסל
+            var table = document.querySelector('.orders-table');
+            var csv = [];
+            var rows = table.querySelectorAll('tr');
+            
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll('td, th');
+                
+                for (var j = 0; j < cols.length - 1; j++) { // דילוג על עמודת הפעולות
+                    var text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/\s\s+/g, ' ');
+                    row.push('"' + text + '"');
+                }
+                
+                csv.push(row.join(','));
+            }
+            
+            var csvText = csv.join('\n');
+            var csvFile = new Blob(["\uFEFF" + csvText], {type: 'text/csv;charset=utf-8;'});
+            
+            // יצירת קישור להורדה
+            var downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(csvFile);
+            downloadLink.download = 'esim_orders_' + new Date().toISOString().slice(0, 10) + '.csv';
+            
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        });
+        
+        <?php if (!empty($monthly_stats)) : ?>
+        // גרף הכנסות לפי חודש
+        var monthlyData = {
+            labels: [<?php 
+                $labels = [];
+                foreach (array_keys($monthly_stats) as $month) {
+                    $labels[] = "'" . date_i18n('M Y', strtotime($month . '-01')) . "'";
+                }
+                echo implode(', ', $labels);
+            ?>],
+            datasets: [{
+                label: 'הכנסות',
+                data: [<?php 
+                    $revenues = [];
+                    foreach ($monthly_stats as $stats) {
+                        $revenues[] = round($stats['revenue'], 2);
+                    }
+                    echo implode(', ', $revenues);
+                ?>],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+        
+        var monthlyCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+        var monthlyChart = new Chart(monthlyCtx, {
+            type: 'bar',
+            data: monthlyData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        <?php endif; ?>
+        
+        <?php if (!empty($countries_stats)) : ?>
+        // גרף הכנסות לפי מדינה
+        var countriesData = {
+            labels: [<?php 
+                $labels = [];
+                $count = 0;
+                foreach (array_keys($countries_stats) as $country) {
+                    if ($count < 7) { // הגבלה ל-7 המדינות המובילות
+                        $labels[] = "'" . $country . "'";
+                        $count++;
+                    }
+                }
+                echo implode(', ', $labels);
+            ?>],
+            datasets: [{
+                label: 'הכנסות',
+                data: [<?php 
+                    $revenues = [];
+                    $count = 0;
+                    foreach ($countries_stats as $stats) {
+                        if ($count < 7) { // הגבלה ל-7 המדינות המובילות
+                            $revenues[] = round($stats['revenue'], 2);
+                            $count++;
+                        }
+                    }
+                    echo implode(', ', $revenues);
+                ?>],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(199, 199, 199, 0.6)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        var countriesCtx = document.getElementById('countriesRevenueChart').getContext('2d');
+        var countriesChart = new Chart(countriesCtx, {
+            type: 'pie',
+            data: countriesData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+        <?php endif; ?>
+    });
+    </script>
     <?php
 }

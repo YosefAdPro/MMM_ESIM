@@ -216,21 +216,29 @@ if ($country_data) {
                         
                         <h2><?php echo esc_html($package_title); ?></h2>
                         
-                        <div class="package-details">
-                            <p class="price"><?php echo esc_html($price); ?> <?php echo esc_html($currency); ?></p>
-                            
-                            <?php if (!empty($data_limit) && !empty($data_unit)) : ?>
-                                <p class="data"><strong>נתונים:</strong> <?php echo esc_html($data_limit . ' ' . $data_unit); ?></p>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($validity_days)) : ?>
-                                <p class="validity"><strong>תוקף:</strong> <?php echo esc_html($validity_days); ?> ימים</p>
-                            <?php endif; ?>
-                            
-                            <?php if (isset($package['providerName'])) : ?>
-                                <p class="provider"><strong>ספק:</strong> <?php echo esc_html($package['providerName']); ?></p>
-                            <?php endif; ?>
-                            
+<div class="package-details">
+    <p class="price"><?php echo esc_html($price); ?> <?php echo esc_html($currency); ?></p>
+    
+    <?php if (!empty($data_limit) && !empty($data_unit)) : ?>
+        <p class="data">
+            <i class="fas fa-database"></i>
+            <strong>נתונים:</strong> <?php echo esc_html($data_limit . ' ' . $data_unit); ?>
+        </p>
+    <?php endif; ?>
+    
+    <?php if (!empty($validity_days)) : ?>
+        <p class="validity">
+            <i class="far fa-calendar-alt"></i>
+            <strong>תוקף:</strong> <?php echo esc_html($validity_days); ?> ימים
+        </p>
+    <?php endif; ?>
+    
+    <?php if (isset($package['providerName'])) : ?>
+        <p class="provider">
+            <i class="fas fa-broadcast-tower"></i>
+            <strong>ספק:</strong> <?php echo esc_html($package['providerName']); ?>
+        </p>
+    <?php endif; ?>
                             <div class="package-description">
                                 <?php
                                 $description = "חבילת גלישה ל" . esc_html($hebrew_country);
@@ -248,23 +256,27 @@ if ($country_data) {
                             $country_networks = AdPro_filter_networks_by_country($all_networks, $country_data['iso']);
                             ?>
 
-                            <?php if (!empty($country_networks)) : ?>
-                                <div class="country-networks">
-                                    <h3>רשתות סלולר נתמכות ב<?php echo esc_html($hebrew_country); ?></h3>
-                                    <div class="networks-grid">
-                                        <?php foreach ($country_networks as $network) : ?>
-                                            <div class="network-item">
-                                                <span class="network-name"><?php echo esc_html($network['brand']); ?></span>
-                                                <?php if (isset($network['is5G']) && $network['is5G']) : ?>
-                                                    <span class="network-technology network-5g">5G</span>
-                                                <?php elseif (isset($network['is4G']) && $network['is4G']) : ?>
-                                                    <span class="network-technology network-4g">4G</span>
-                                                <?php endif; ?>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
+<?php if (!empty($country_networks)) : ?>
+    <div class="country-networks">
+        <h3>רשתות סלולר נתמכות ב<?php echo esc_html($hebrew_country); ?></h3>
+        <div class="networks-grid">
+            <?php foreach ($country_networks as $network) : ?>
+                <div class="network-item">
+                    <span class="network-name"><?php echo esc_html($network['brand']); ?></span>
+                    <?php if (isset($network['is5G']) && $network['is5G']) : ?>
+                        <span class="network-technology network-5g">
+                            <i class="fas fa-wifi"></i> 5G
+                        </span>
+                    <?php elseif (isset($network['is4G']) && $network['is4G']) : ?>
+                        <span class="network-technology network-4g">
+                            <i class="fas fa-signal"></i> 4G
+                        </span>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+<?php endif; ?>
                             
                             <?php if (!empty($supported_countries) && count($supported_countries) > 0) : ?>
                                 <div class="supported-countries">

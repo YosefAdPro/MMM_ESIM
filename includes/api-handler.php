@@ -14,12 +14,81 @@ if (!defined('ABSPATH')) {
  * @return array מערך של חבילות
  */
 function AdPro_esim_get_packages($country = '') {
+    // אם ביקשו מדינה ספציפית
+    if (!empty($country)) {
+        // בדיקה אם יש קובץ ספציפי למדינה
+        $country_file = ADPRO_ESIM_PATH . 'data/' . strtolower($country) . '.json';
+        
+        if (file_exists($country_file)) {
+            $json_data = file_get_contents($country_file);
+            $packages = json_decode($json_data, true);
+            
+            if ($packages !== null) {
+                // סינון חבילות עם מגבלת מהירות
+                $packages = AdPro_filter_speed_restricted_packages($packages);
+                
+                // סינון ספקים מוסתרים
+                $hidden_providers = get_option('AdPro_hidden_providers', []);
+                if (!empty($hidden_providers)) {
+                    $packages = array_filter($packages, function($package) use ($hidden_providers) {
+                        return !isset($package['providerId']) || !in_array($package['providerId'], $hidden_providers);
+                    });
+                    $packages = array_values($packages);
+                }
+                
+                return $packages;
+            }
+        }
+    } 
+    // אם ביקשו את כל החבילות, ננסה לאסוף מכל הקבצים
+    else {
+        // קבלת רשימת המדינות
+        $countries_list_file = ADPRO_ESIM_PATH . 'data/countries_list.json';
+        
+        if (file_exists($countries_list_file)) {
+            $countries_list = json_decode(file_get_contents($countries_list_file), true);
+            $all_packages = [];
+            
+            // איסוף החבילות מכל המדינות
+            foreach ($countries_list as $iso) {
+                $country_file = ADPRO_ESIM_PATH . 'data/' . strtolower($iso) . '.json';
+                
+                if (file_exists($country_file)) {
+                    $country_packages = json_decode(file_get_contents($country_file), true);
+                    if (is_array($country_packages)) {
+                        $all_packages = array_merge($all_packages, $country_packages);
+                    }
+                }
+            }
+            
+            if (!empty($all_packages)) {
+                // סינון חבילות עם מגבלת מהירות
+                $all_packages = AdPro_filter_speed_restricted_packages($all_packages);
+                
+                // סינון ספקים מוסתרים
+                $hidden_providers = get_option('AdPro_hidden_providers', []);
+                if (!empty($hidden_providers)) {
+                    $all_packages = array_filter($all_packages, function($package) use ($hidden_providers) {
+                        return !isset($package['providerId']) || !in_array($package['providerId'], $hidden_providers);
+                    });
+                    $all_packages = array_values($all_packages);
+                }
+                
+                return $all_packages;
+            }
+        }
+    }
+    
+    error_log("No valid JSON data found, falling back to API/cache");
+    
+    // הקוד הישן כגיבוי...
     // בדיקה אם יש במטמון
     $cache_key = 'AdPro_esim_packages_' . md5($country);
     $cached_packages = get_transient($cache_key);
     
     // אם יש במטמון וזה לא מצב דיבאג, החזר את המטמון
     if ($cached_packages !== false && !isset($_GET['no_cache'])) {
+        error_log("Returning packages from WordPress transient cache");
         return $cached_packages;
     }
 
@@ -82,6 +151,9 @@ function AdPro_esim_get_packages($country = '') {
     // קבל את החבילות מהתגובה
     $packages = isset($data['result']) ? $data['result'] : [];
     
+    // סינון חבילות עם מגבלת מהירות
+    $packages = AdPro_filter_speed_restricted_packages($packages);
+    
     // סינון ספקים שסומנו להסתרה
     $hidden_providers = get_option('AdPro_hidden_providers', []);
     
@@ -127,6 +199,44 @@ function AdPro_esim_get_packages($country = '') {
     // שמור במטמון וגם החזר
     set_transient($cache_key, $packages, 1 * HOUR_IN_SECONDS); // שמור במטמון לשעה
     return $packages;
+}
+
+/**
+ * פונקציה לסינון חבילות עם מגבלת מהירות
+ * 
+ * @param array $packages מערך החבילות לסינון
+ * @return array מערך חבילות מסונן
+ */
+function AdPro_filter_speed_restricted_packages($packages) {
+    if (empty($packages) || !is_array($packages)) {
+        return $packages;
+    }
+    
+    $filtered_packages = array_filter($packages, function($package) {
+        // בדיקה אם יש פרטי מוצר
+        if (!isset($package['productDetails']) || !is_array($package['productDetails'])) {
+            return true;
+        }
+        
+        foreach ($package['productDetails'] as $detail) {
+            // חפש את שדה המהירות
+            if ($detail['name'] === 'SPEED') {
+                $speed_value = strtolower($detail['value']);
+                
+                // הסתר חבילות עם מגבלת מהירות (Mbps או Limited)
+                if (stripos($speed_value, 'mbps') !== false || 
+                    $speed_value === 'limited' || 
+                    stripos($speed_value, '7') !== false) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    });
+    
+    // המר בחזרה למערך רגיל
+    return array_values($filtered_packages);
 }
 
 /**
@@ -245,6 +355,11 @@ function AdPro_validate_api_key() {
  * @return array מערך של רשתות סלולריות
  */
 function AdPro_get_product_networks($product_id) {
+	
+	    error_log('Requesting networks for product: ' . $product_id);
+// לוג פרטי הבקשה לדיבוג
+error_log('API URL: ' . $api_url);
+error_log('API Headers: ' . json_encode($args['headers']));
     // בדיקה אם יש במטמון
     $cache_key = 'AdPro_product_networks_' . md5($product_id);
     $cached_networks = get_transient($cache_key);
@@ -310,15 +425,14 @@ function AdPro_get_product_networks($product_id) {
  * @param string $country_iso קוד ISO של המדינה
  * @return array מערך מסונן של רשתות סלולריות
  */
-function AdPro_filter_networks_by_country($networks, $country_iso) {
-    if (empty($networks) || empty($country_iso)) {
+function AdPro_filter_networks_by_country($networks, $country_code) {
+    if (empty($networks) || empty($country_code)) {
         return [];
     }
     
     $filtered_networks = [];
-    
     foreach ($networks as $network) {
-        if (isset($network['country']) && strtoupper($network['country']) === strtoupper($country_iso)) {
+        if (isset($network['countryCode']) && $network['countryCode'] === $country_code) {
             $filtered_networks[] = $network;
         }
     }

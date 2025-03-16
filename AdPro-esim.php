@@ -35,6 +35,27 @@ function AdPro_woocommerce_missing_notice() {
 }
 
 /**
+ * בדיקה אם תוסף iCount רשמי מותקן ופעיל
+ */
+function AdPro_check_icount_plugin() {
+    // שם הקובץ הראשי של תוסף iCount - יש להתאים לשם האמיתי של התוסף
+    $icount_plugin = 'icount-payment-gateway/icount-payment-gateway.php'; 
+    
+    if (!is_plugin_active($icount_plugin)) {
+        add_action('admin_notices', 'AdPro_icount_plugin_missing_notice');
+    }
+}
+add_action('admin_init', 'AdPro_check_icount_plugin');
+
+function AdPro_icount_plugin_missing_notice() {
+    ?>
+    <div class="notice notice-warning">
+        <p><?php _e('AdPro eSIM מומלץ להתקין את התוסף הרשמי של iCount לסליקת אשראי.', 'AdPro-esim'); ?></p>
+    </div>
+    <?php
+}
+
+/**
  * טעינת קבצי התוסף רק אחרי ש-WooCommerce זמין
  */
 add_action('plugins_loaded', function() {
@@ -49,43 +70,10 @@ add_action('plugins_loaded', function() {
     require_once plugin_dir_path(__FILE__) . 'includes/countries-mapping.php';
     require_once plugin_dir_path(__FILE__) . 'public/frontend.php';
     require_once plugin_dir_path(__FILE__) . 'includes/woocommerce-esim-integration.php';
-    require_once plugin_dir_path(__FILE__) . 'includes/emergency-payment.php';
+    
+    // טעינת קובץ האינטגרציה החדש עם תוסף iCount רשמי
+    require_once plugin_dir_path(__FILE__) . 'includes/icount-integration.php';
 }, 5);
-
-/**
- * רישום שער התשלום iCount
- */
-function AdPro_register_payment_gateways($gateways) {
-    if (!class_exists('WC_Payment_Gateway')) {
-        error_log('WooCommerce Payment Gateway class not found');
-        return $gateways;
-    }
-    
-    if (!class_exists('WC_iCount_Gateway')) {
-        require_once ADPRO_ESIM_PATH . 'includes/class-wc-icount-gateway.php';
-    }
-    
-    $gateways[] = new WC_iCount_Gateway();
-    error_log('Successfully registered iCount gateway');
-    return $gateways;
-}
-add_filter('woocommerce_payment_gateways', 'AdPro_register_payment_gateways', 20);
-
-/**
- * וודא ש-WooCommerce נטען לפני ניסיון להשתמש בו
- */
-function AdPro_init_payment_gateway() {
-    // בדוק אם WooCommerce פעיל
-    if (!class_exists('WooCommerce')) {
-        return;
-    }
-    
-    // וודא שיש גישה ל-WC()
-    if (!function_exists('WC')) {
-        return;
-    }
-}
-add_action('plugins_loaded', 'AdPro_init_payment_gateway', 20);
 
 /**
  * הוספת כללי שכתוב לניתובים מותאמים
@@ -171,56 +159,771 @@ function AdPro_esim_account_menu_items($items) {
 }
 add_filter('woocommerce_account_menu_items', 'AdPro_esim_account_menu_items');
 
+/**
+ * פונקציה לקבלת נתוני שימוש של eSIM
+ * 
+ * @param string $order_id מזהה הזמנה
+ * @return array נתוני שימוש
+ */
+function AdPro_get_esim_usage_data($order_id) {
+    // תמיד החזר נתוני דוגמה בשלב הפיתוח
+    return [
+        "ussdCode" => null,
+        "esim" => [
+            "status" => "Ready",
+            "smdpCode" => "Enable, Executed-Success",
+            "installationDate" => "2025-02-23T08:10:22",
+            "location" => [
+                "updated" => "2025-03-02T19:59:00",
+                "country" => "PL",
+                "network" => "Plus"
+            ],
+            "kycStatus" => null,
+            "iccid" => "8948010000010937167",
+            "phoneNumber" => null,
+            "puk" => "60532154",
+            "isSuspended" => null,
+            "wallet" => [
+                "balanceHkd" => 0
+            ]
+        ],
+        "packages" => [
+            [
+                "name" => "Ukraine and Moldova 10 GB",
+                "associatedProductId" => "8fb580a0-466e-4844-b48c-63e5c4f43f57",
+                "activationDate" => "2025-02-23T08:26:18",
+                "expirationDate" => "2025-02-25T08:26:18",
+                "totalAllowanceMb" => 12288,
+                "totalAllowanceMin" => null,
+                "usedMin" => null,
+                "usedMb" => 2000
+            ]
+        ]
+    ];
+    
+    // הקוד המקורי לא ירוץ כי יש return למעלה
+    if (empty($order_id)) {
+        return [];
+    }
+    
+    // הגדרת מפתח מטמון
+    $cache_key = 'esim_usage_' . $order_id;
+    
+    // בדיקה אם המידע נמצא במטמון
+    $cached_data = get_transient($cache_key);
+    
+    if (false !== $cached_data) {
+        return $cached_data;
+    }
+    
+    // שליחת בקשת API
+    $api_url = 'https://myesim.info/usage?orderId=' . urlencode($order_id);
+    
+    $response = wp_remote_get($api_url, [
+        'timeout' => 15,
+        'headers' => [
+            'Accept' => 'application/json',
+        ],
+    ]);
+    
+    if (is_wp_error($response)) {
+        error_log('Error fetching eSIM usage data: ' . $response->get_error_message());
+        return [];
+    }
+    
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    
+    if ($response_code !== 200) {
+        error_log('Error in eSIM usage API response: ' . $response_code);
+        return [];
+    }
+    
+    $data = json_decode($response_body, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log('Error parsing eSIM usage JSON: ' . json_last_error_msg());
+        return [];
+    }
+    
+    // שמירת המידע במטמון ל-30 דקות
+    set_transient($cache_key, $data, 30 * MINUTE_IN_SECONDS);
+    
+    return $data;
+}
+
 function AdPro_esim_account_content() {
     $user_id = get_current_user_id();
+    
+    // טעינת הסגנונות
+    wp_enqueue_style('AdPro-esim-myaccount', ADPRO_ESIM_URL . 'public/assets/css/myaccount.css');
+    
+    // בדיקה אם להציג חבילות שפג תוקפן (ברירת מחדל: לא)
+    $show_expired = isset($_GET['show_expired']) ? true : false;
+    
+    // קבלת רכישות מהמטא-דאטה של המשתמש (הישן)
     $purchases = get_user_meta($user_id, 'AdPro_esim_purchase', false);
+    
+    // קבלת ההזמנות האחרונות עם חבילות eSIM
+    $args = [
+        'customer_id' => $user_id,
+        'status' => ['completed', 'processing'],
+        'limit' => 50, // הגדלת הגבול כדי לראות יותר חבילות
+    ];
+    $orders = wc_get_orders($args);
+    $esim_orders = [];
+    $expired_orders = [];
+    $active_count = 0;
+    $expired_count = 0;
+    
+    // נתונים שימושיים
+    $current_date = new DateTime();
+    
+    // בדיקה אם יש חבילות eSIM בהזמנות
+    foreach ($orders as $order) {
+        $has_esim = false;
+        $country = '';
+        $package_id = '';
+        $package_title = '';
+        $data_limit = '';
+        $data_unit = '';
+        $validity_days = '';
+        
+        // בדיקה אם יש פריטים עם מטא-דאטה של eSIM
+        foreach ($order->get_items() as $item) {
+            if ($item->get_meta('esim_package_id')) {
+                $has_esim = true;
+                $country = $item->get_meta('esim_country');
+                $package_id = $item->get_meta('esim_package_id');
+                
+                // חילוץ פרטי חבילה נוספים
+                $data_limit = $item->get_meta('esim_data_limit');
+                $data_unit = $item->get_meta('esim_data_unit');
+                $validity_days = $item->get_meta('esim_validity_days');
+                $package_title = $item->get_name();
+                break;
+            }
+        }
+        
+        // בדיקה אם יש eSIM ויש קוד QR, הוסף לרשימה
+        if ($has_esim && $order->get_meta('_esim_qr_code')) {
+            $order_data = [
+                'order_id' => $order->get_id(),
+                'mobimatter_id' => $order->get_meta('_mobimatter_order_id'),
+                'country' => $country,
+                'package_id' => $package_id,
+                'package_title' => $package_title,
+                'data_limit' => $data_limit,
+                'data_unit' => $data_unit,
+                'validity_days' => $validity_days,
+                'purchase_date' => $order->get_date_created()->date('Y-m-d H:i:s'),
+                'qr_code' => $order->get_meta('_esim_qr_code'),
+                'activation_code' => $order->get_meta('_esim_activation_code')
+            ];
+            
+            // קבלת נתוני שימוש עבור החבילה
+            $usage_data = AdPro_get_esim_usage_data($order_data['mobimatter_id']);
+            
+            // בדיקה אם החבילה פגת תוקף
+            $is_expired = false;
+            if (!empty($usage_data) && !empty($usage_data['packages'])) {
+                $package = $usage_data['packages'][0];
+                if (isset($package['expirationDate'])) {
+                    $exp_date = new DateTime($package['expirationDate']);
+                    if ($current_date > $exp_date) {
+                        $is_expired = true;
+                        $expired_count++;
+                    } else {
+                        $active_count++;
+                    }
+                }
+            }
+            
+            // הוספה לרשימה המתאימה
+            if ($is_expired) {
+                $expired_orders[] = $order_data;
+            } else {
+                $esim_orders[] = $order_data;
+            }
+        }
+    }
+    
+    // בדיקה גם לגבי רכישות קיימות
+    foreach ($purchases as $index => $purchase) {
+        // קבלת נתוני שימוש גם עבור הרכישות הישנות
+        $usage_data = AdPro_get_esim_usage_data($purchase['order_id']);
+        
+        // בדיקה אם החבילה פגת תוקף
+        $is_expired = false;
+        if (!empty($usage_data) && !empty($usage_data['packages'])) {
+            $package = $usage_data['packages'][0];
+            if (isset($package['expirationDate'])) {
+                $exp_date = new DateTime($package['expirationDate']);
+                if ($current_date > $exp_date) {
+                    $is_expired = true;
+                    $expired_count++;
+                } else {
+                    $active_count++;
+                }
+            }
+        }
+        
+        // העברת רכישות פגות תוקף למערך נפרד אם לא נבחר להציג אותן
+        if ($is_expired && !$show_expired) {
+            unset($purchases[$index]);
+        }
+    }
     ?>
-    <h2>חבילות eSIM שלי</h2>
-    <?php if ($purchases) : ?>
-        <table>
-            <tr>
-                <th>מדינה</th>
-                <th>חבילה</th>
-                <th>תאריך רכישה</th>
-                <th>QR</th>
-                <th>גלישה נותרה</th>
-            </tr>
-            <?php foreach ($purchases as $purchase) : ?>
-                <?php
-                $api_key = get_option('AdPro_api_key');
-                $response = wp_remote_get("https://api.AdPro.com/v1/orders/info?order_id={$purchase['order_id']}", [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $api_key,
-                    ],
-                ]);
-                $usage = is_wp_error($response) ? [] : json_decode(wp_remote_retrieve_body($response), true);
+    <div class="esim-my-packages">
+        <h2>חבילות eSIM שלי</h2>
+        
+        <div class="esim-packages-filter">
+            <?php if ($expired_count > 0): ?>
+                <?php if (!$show_expired): ?>
+                    <a href="?show_expired=1" class="show-expired-button">הצג חבילות שפג תוקפן (<?php echo $expired_count; ?>)</a>
+                <?php else: ?>
+                    <a href="?" class="hide-expired-button">הסתר חבילות שפג תוקפן</a>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+        
+        <?php if (!empty($esim_orders) || (!empty($expired_orders) && $show_expired)): ?>
+            <div class="esim-packages-list">
+                <?php 
+                // הצגת החבילות הפעילות
+                foreach ($esim_orders as $order) : 
+                    // קבלת נתוני שימוש עבור החבילה
+                    $usage_data = AdPro_get_esim_usage_data($order['mobimatter_id']);
+                    
+                    // עיבוד נתוני השימוש
+                    $country_code = '';
+                    $network = '';
+                    $expiration_date = '';
+                    $total_mb = 0;
+                    $used_mb = 0;
+                    $status = '';
+                    
+                    if (!empty($usage_data)) {
+                        // חילוץ נתוני שימוש
+                        if (isset($usage_data['esim']['status'])) {
+                            $status = $usage_data['esim']['status'];
+                        }
+                        
+                        if (isset($usage_data['esim']['location']['country'])) {
+                            $country_code = $usage_data['esim']['location']['country'];
+                        }
+                        
+                        if (isset($usage_data['esim']['location']['network'])) {
+                            $network = $usage_data['esim']['location']['network'];
+                        }
+                        
+                        if (!empty($usage_data['packages'])) {
+                            $package = $usage_data['packages'][0]; // לוקח את החבילה הראשונה
+                            
+                            if (isset($package['expirationDate'])) {
+                                $exp_date = new DateTime($package['expirationDate']);
+                                $expiration_date = $exp_date->format('d/m/Y');
+                            }
+                            
+                            if (isset($package['totalAllowanceMb'])) {
+                                $total_mb = $package['totalAllowanceMb'];
+                            }
+                            
+                            if (isset($package['usedMb'])) {
+                                $used_mb = $package['usedMb'];
+                            }
+                        }
+                    }
+                    
+                    // חישוב אחוז ניצול
+                    $usage_percent = ($total_mb > 0) ? min(100, round(($used_mb / $total_mb) * 100)) : 0;
                 ?>
-                <tr>
-                    <td><?php echo esc_html($purchase['country']); ?></td>
-                    <td><?php echo esc_html($purchase['package_id']); ?></td>
-                    <td><?php echo esc_html($purchase['purchase_date']); ?></td>
-                    <td><img src="<?php echo esc_url($purchase['qr_code']); ?>" alt="QR Code"></td>
-                    <td><?php echo esc_html($usage['data_remaining'] ?? 'לא זמין'); ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    <?php else : ?>
-        <p>לא נמצאו רכישות.</p>
-    <?php endif; ?>
+                    <div class="esim-package-card">
+                        <div class="esim-package-header">
+                            <h3><?php echo esc_html($order['package_title']); ?></h3>
+                            <div class="esim-package-country">
+                                <?php echo esc_html($order['country']); ?>
+                            </div>
+                        </div>
+                        
+                        <div class="esim-package-details">
+                            <div class="esim-package-info">
+                                <div class="esim-package-data">
+                                    <strong>נפח גלישה:</strong> 
+                                    <?php 
+                                    if (!empty($order['data_limit']) && !empty($order['data_unit'])) {
+                                        echo esc_html($order['data_limit'] . ' ' . $order['data_unit']);
+                                    } elseif ($total_mb > 0) {
+                                        echo esc_html(round($total_mb / 1024, 1) . ' GB');
+                                    } else {
+                                        echo 'לא ידוע';
+                                    }
+                                    ?>
+                                </div>
+                                
+                                <div class="esim-package-validity">
+                                    <strong>תוקף:</strong> 
+                                    <?php 
+                                    if (!empty($expiration_date)) {
+                                        echo esc_html($expiration_date);
+                                    } elseif (!empty($order['validity_days'])) {
+                                        echo esc_html($order['validity_days'] . ' ימים');
+                                    } else {
+                                        echo 'לא ידוע';
+                                    }
+                                    ?>
+                                </div>
+                                
+                                <div class="esim-package-code">
+                                    <strong>קוד הפעלה:</strong> 
+                                    <span class="activation-code"><?php echo esc_html($order['activation_code']); ?></span>
+                                </div>
+                                
+                                <?php if (!empty($status)) : ?>
+                                <div class="esim-package-status">
+                                    <strong>סטטוס:</strong> 
+                                    <span class="status-badge <?php echo sanitize_title($status); ?>">
+                                        <?php
+                                        $status_text = '';
+                                        switch ($status) {
+                                            case 'Installed':
+                                                $status_text = 'מותקן';
+                                                break;
+                                            case 'Enabled':
+                                                $status_text = 'מופעל';
+                                                break;
+                                            case 'Activated':
+                                                $status_text = 'פעיל';
+                                                break;
+                                            case 'Ready':
+                                                $status_text = 'מוכן';
+                                                break;
+                                            default:
+                                                $status_text = $status;
+                                                break;
+                                        }
+                                        echo esc_html($status_text);
+                                        ?>
+                                    </span>
+                                </div>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($country_code) && !empty($network)) : ?>
+                                <div class="esim-package-location">
+                                    <strong>רישום אחרון:</strong>
+                                    <?php if (!empty($country_code)) : ?>
+                                        <span class="country-flag">
+                                            <img src="https://flagcdn.com/16x12/<?php echo strtolower($country_code); ?>.png" alt="<?php echo esc_attr($country_code); ?>">
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php echo esc_html($network); ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <?php if (!empty($order['qr_code'])) : ?>
+                            <div class="esim-package-qr">
+                                <img src="<?php echo esc_url($order['qr_code']); ?>" alt="QR Code">
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <?php if ($total_mb > 0) : ?>
+                        <div class="esim-package-usage">
+                            <div class="usage-title">ניצול חבילה:</div>
+                            <div class="usage-bar-container">
+                                <div class="usage-bar" style="width: <?php echo esc_attr($usage_percent); ?>%"></div>
+                            </div>
+                            <div class="usage-stats">
+                                <span class="used"><?php echo round($used_mb / 1024, 2); ?> GB</span>
+                                <span class="total"><?php echo round($total_mb / 1024, 2); ?> GB</span>
+                                <span class="percent"><?php echo $usage_percent; ?>%</span>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+                
+                <?php if ($show_expired && !empty($expired_orders)) : ?>
+                    <?php foreach ($expired_orders as $order) : 
+                        // קבלת נתוני שימוש עבור החבילה
+                        $usage_data = AdPro_get_esim_usage_data($order['mobimatter_id']);
+                        
+                        // עיבוד נתוני השימוש - זהה לחלק הקודם
+                        $country_code = '';
+                        $network = '';
+                        $expiration_date = '';
+                        $total_mb = 0;
+                        $used_mb = 0;
+                        $status = '';
+                        
+                        if (!empty($usage_data)) {
+                            if (isset($usage_data['esim']['status'])) {
+                                $status = $usage_data['esim']['status'];
+                            }
+                            
+                            if (isset($usage_data['esim']['location']['country'])) {
+                                $country_code = $usage_data['esim']['location']['country'];
+                            }
+                            
+                            if (isset($usage_data['esim']['location']['network'])) {
+                                $network = $usage_data['esim']['location']['network'];
+                            }
+                            
+                            if (!empty($usage_data['packages'])) {
+                                $package = $usage_data['packages'][0];
+                                
+                                if (isset($package['expirationDate'])) {
+                                    $exp_date = new DateTime($package['expirationDate']);
+                                    $expiration_date = $exp_date->format('d/m/Y');
+                                }
+                                
+                                if (isset($package['totalAllowanceMb'])) {
+                                    $total_mb = $package['totalAllowanceMb'];
+                                }
+                                
+                                if (isset($package['usedMb'])) {
+                                    $used_mb = $package['usedMb'];
+                                }
+                            }
+                        }
+                        
+                        // חישוב אחוז ניצול
+                        $usage_percent = ($total_mb > 0) ? min(100, round(($used_mb / $total_mb) * 100)) : 0;
+                    ?>
+                        <div class="esim-package-card expired">
+                            <div class="expired-badge">פג תוקף</div>
+                            <div class="esim-package-header">
+                                <h3><?php echo esc_html($order['package_title']); ?></h3>
+                                <div class="esim-package-country">
+                                    <?php echo esc_html($order['country']); ?>
+                                </div>
+                            </div>
+                            
+                            <div class="esim-package-details">
+                                <div class="esim-package-info">
+                                    <div class="esim-package-data">
+                                        <strong>נפח גלישה:</strong> 
+                                        <?php 
+                                        if (!empty($order['data_limit']) && !empty($order['data_unit'])) {
+                                            echo esc_html($order['data_limit'] . ' ' . $order['data_unit']);
+                                        } elseif ($total_mb > 0) {
+                                            echo esc_html(round($total_mb / 1024, 1) . ' GB');
+                                        } else {
+                                            echo 'לא ידוע';
+                                        }
+                                        ?>
+                                    </div>
+                                    
+                                    <div class="esim-package-validity">
+                                        <strong>תוקף:</strong> 
+                                        <?php 
+                                        if (!empty($expiration_date)) {
+                                            echo esc_html($expiration_date);
+                                        } elseif (!empty($order['validity_days'])) {
+                                            echo esc_html($order['validity_days'] . ' ימים');
+                                        } else {
+                                            echo 'לא ידוע';
+                                        }
+                                        ?>
+                                    </div>
+                                    
+                                    <div class="esim-package-code">
+                                        <strong>קוד הפעלה:</strong> 
+                                        <span class="activation-code"><?php echo esc_html($order['activation_code']); ?></span>
+                                    </div>
+                                    
+                                    <?php if (!empty($status)) : ?>
+                                    <div class="esim-package-status">
+                                        <strong>סטטוס:</strong> 
+                                        <span class="status-badge <?php echo sanitize_title($status); ?>">
+                                            <?php
+                                            $status_text = '';
+                                            switch ($status) {
+                                                case 'Installed':
+                                                    $status_text = 'מותקן';
+                                                    break;
+                                                case 'Enabled':
+                                                    $status_text = 'מופעל';
+                                                    break;
+													case 'Activated':
+                                                    $status_text = 'פעיל';
+                                                    break;
+                                                case 'Ready':
+                                                    $status_text = 'מוכן';
+                                                    break;
+                                                default:
+                                                    $status_text = $status;
+                                                    break;
+                                            }
+                                            echo esc_html($status_text);
+                                            ?>
+                                        </span>
+                                    </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($country_code) && !empty($network)) : ?>
+                                    <div class="esim-package-location">
+                                        <strong>רישום אחרון:</strong>
+                                        <?php if (!empty($country_code)) : ?>
+                                            <span class="country-flag">
+                                                <img src="https://flagcdn.com/16x12/<?php echo strtolower($country_code); ?>.png" alt="<?php echo esc_attr($country_code); ?>">
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php echo esc_html($network); ?>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <?php if (!empty($order['qr_code'])) : ?>
+                                <div class="esim-package-qr">
+                                    <img src="<?php echo esc_url($order['qr_code']); ?>" alt="QR Code">
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <?php if ($total_mb > 0) : ?>
+                            <div class="esim-package-usage">
+                                <div class="usage-title">ניצול חבילה:</div>
+                                <div class="usage-bar-container">
+                                    <div class="usage-bar" style="width: <?php echo esc_attr($usage_percent); ?>%"></div>
+                                </div>
+                                <div class="usage-stats">
+                                    <span class="used"><?php echo round($used_mb / 1024, 2); ?> GB</span>
+                                    <span class="total"><?php echo round($total_mb / 1024, 2); ?> GB</span>
+                                    <span class="percent"><?php echo $usage_percent; ?>%</span>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                
+                <?php 
+                // הצגת רכישות קיימות (אם יש)
+                foreach ($purchases as $purchase) : 
+                    // קבלת נתוני שימוש גם עבור הרכישות הישנות
+                    $usage_data = AdPro_get_esim_usage_data($purchase['order_id']);
+                    
+                    // עיבוד נתוני השימוש
+                    $country_code = '';
+                    $network = '';
+                    $expiration_date = '';
+                    $total_mb = 0;
+                    $used_mb = 0;
+                    $status = '';
+                    
+                    if (!empty($usage_data)) {
+                        // עיבוד נתונים זהה לקטע הקודם
+                        if (isset($usage_data['esim']['status'])) {
+                            $status = $usage_data['esim']['status'];
+                        }
+                        
+                        if (isset($usage_data['esim']['location']['country'])) {
+                            $country_code = $usage_data['esim']['location']['country'];
+                        }
+                        
+                        if (isset($usage_data['esim']['location']['network'])) {
+                            $network = $usage_data['esim']['location']['network'];
+                        }
+                        
+                        if (!empty($usage_data['packages'])) {
+                            $package = $usage_data['packages'][0];
+                            
+                            if (isset($package['expirationDate'])) {
+                                $exp_date = new DateTime($package['expirationDate']);
+                                $expiration_date = $exp_date->format('d/m/Y');
+                            }
+                            
+                            if (isset($package['totalAllowanceMb'])) {
+                                $total_mb = $package['totalAllowanceMb'];
+                            }
+                            
+                            if (isset($package['usedMb'])) {
+                                $used_mb = $package['usedMb'];
+                            }
+                        }
+                    }
+                    
+                    // חישוב אחוז ניצול
+                    $usage_percent = ($total_mb > 0) ? min(100, round(($used_mb / $total_mb) * 100)) : 0;
+                ?>
+                    <div class="esim-package-card">
+                        <!-- תוכן זהה לתצוגת ההזמנות החדשות עם שינויים לנתונים מהרכישות הישנות -->
+                        <div class="esim-package-header">
+                            <h3><?php echo esc_html($purchase['package_id']); ?></h3>
+                            <div class="esim-package-country">
+                                <?php echo esc_html($purchase['country']); ?>
+                            </div>
+                        </div>
+                        
+                        <div class="esim-package-details">
+                            <div class="esim-package-info">
+                                <div class="esim-package-data">
+                                    <strong>נפח גלישה:</strong> 
+                                    <?php 
+                                    if ($total_mb > 0) {
+                                        echo esc_html(round($total_mb / 1024, 1) . ' GB');
+                                    } else {
+                                        echo 'לא ידוע';
+                                    }
+                                    ?>
+                                </div>
+                                
+                                <div class="esim-package-validity">
+                                    <strong>תוקף:</strong> 
+                                    <?php echo !empty($expiration_date) ? esc_html($expiration_date) : 'לא ידוע'; ?>
+                                </div>
+                                
+                                <div class="esim-package-code">
+                                    <strong>קוד הפעלה:</strong> 
+                                    <span class="activation-code"><?php echo esc_html($purchase['activation_code']); ?></span>
+                                </div>
+                                
+                                <?php if (!empty($status)) : ?>
+                                <div class="esim-package-status">
+                                    <strong>סטטוס:</strong> 
+                                    <span class="status-badge <?php echo sanitize_title($status); ?>">
+                                        <?php
+                                        $status_text = '';
+                                        switch ($status) {
+                                            case 'Installed':
+                                                $status_text = 'מותקן';
+                                                break;
+                                            case 'Enabled':
+                                                $status_text = 'מופעל';
+                                                break;
+                                            case 'Activated':
+                                                $status_text = 'פעיל';
+                                                break;
+                                            case 'Ready':
+                                                $status_text = 'מוכן';
+                                                break;
+                                            default:
+                                                $status_text = $status;
+                                                break;
+                                        }
+                                        echo esc_html($status_text);
+                                        ?>
+                                    </span>
+                                </div>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($country_code) && !empty($network)) : ?>
+                                <div class="esim-package-location">
+                                    <strong>רישום אחרון:</strong>
+                                    <?php if (!empty($country_code)) : ?>
+                                        <span class="country-flag">
+                                            <img src="https://flagcdn.com/16x12/<?php echo strtolower($country_code); ?>.png" alt="<?php echo esc_attr($country_code); ?>">
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php echo esc_html($network); ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <?php if (!empty($purchase['qr_code'])) : ?>
+                            <div class="esim-package-qr">
+                                <img src="<?php echo esc_url($purchase['qr_code']); ?>" alt="QR Code">
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <?php if ($total_mb > 0) : ?>
+                        <div class="esim-package-usage">
+                            <div class="usage-title">ניצול חבילה:</div>
+                            <div class="usage-bar-container">
+                                <div class="usage-bar" style="width: <?php echo esc_attr($usage_percent); ?>%"></div>
+                            </div>
+                            <div class="usage-stats">
+                                <span class="used"><?php echo round($used_mb / 1024, 2); ?> GB</span>
+                                <span class="total"><?php echo round($total_mb / 1024, 2); ?> GB</span>
+                                <span class="percent"><?php echo $usage_percent; ?>%</span>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else : ?>
+            <p>לא נמצאו רכישות.</p>
+        <?php endif; ?>
+    </div>
     <?php
 }
 add_action('woocommerce_account_AdPro-esim_endpoint', 'AdPro_esim_account_content');
 
 /**
- * הוספת סקריפטים וסגנונות לטופס התשלום
+ * הוספת סקריפטים וסגנונות
  */
-function AdPro_enqueue_payment_scripts() {
+function AdPro_enqueue_scripts() {
+    // סגנונות למסך חשבון אישי
+    wp_register_style('AdPro-esim-myaccount', ADPRO_ESIM_URL . 'public/assets/css/myaccount.css');
+    
+    // סגנונות לטופס תשלום
     if (is_checkout()) {
         wp_enqueue_style('AdPro-payment-styles', ADPRO_ESIM_URL . 'public/assets/css/payment.css');
         wp_enqueue_script('AdPro-payment-scripts', ADPRO_ESIM_URL . 'public/assets/js/payment.js', array('jquery'), null, true);
     }
 }
-add_action('wp_enqueue_scripts', 'AdPro_enqueue_payment_scripts');
+add_action('wp_enqueue_scripts', 'AdPro_enqueue_scripts');
+
+/**
+ * הוספת רכישת eSIM למטא-דאטה של המשתמש
+ */
+function AdPro_add_esim_purchase_to_user_meta($order_id) {
+    $order = wc_get_order($order_id);
+    
+    if (!$order) {
+        return;
+    }
+    
+    // בדיקה אם מדובר בהזמנת eSIM
+    $has_esim = false;
+    $country = '';
+    $package_id = '';
+    
+    foreach ($order->get_items() as $item) {
+        if ($item->get_meta('esim_package_id')) {
+            $has_esim = true;
+            $country = $item->get_meta('esim_country');
+            $package_id = $item->get_meta('esim_package_id');
+            break;
+        }
+    }
+    
+    if (!$has_esim) {
+        return;
+    }
+    
+    // בדיקה אם יש קוד QR ומזהה הזמנת מובימטר
+    $qr_code = $order->get_meta('_esim_qr_code');
+    $activation_code = $order->get_meta('_esim_activation_code');
+    $mobimatter_order_id = $order->get_meta('_mobimatter_order_id');
+    
+    if (empty($qr_code) || empty($mobimatter_order_id)) {
+        return;
+    }
+    
+    // הוספת הרכישה לרשימת הרכישות של המשתמש
+    $user_id = $order->get_user_id();
+    
+    if ($user_id) {
+        $purchase_data = [
+            'order_id' => $mobimatter_order_id,
+            'country' => $country,
+            'package_id' => $package_id,
+            'purchase_date' => date('Y-m-d H:i:s'),
+            'qr_code' => $qr_code,
+            'activation_code' => $activation_code
+        ];
+        
+        add_user_meta($user_id, 'AdPro_esim_purchase', $purchase_data);
+        error_log('DEBUG - Added purchase data to user meta for order #' . $order_id);
+    }
+}
+add_action('woocommerce_order_status_completed', 'AdPro_add_esim_purchase_to_user_meta', 20);
+add_action('woocommerce_payment_complete', 'AdPro_add_esim_purchase_to_user_meta', 20);
 
 /**
  * פעולות הרשמה/הסרה של התוסף
@@ -234,35 +937,4 @@ function AdPro_flush_all_rules() {
 
 register_deactivation_hook(__FILE__, function() {
     flush_rewrite_rules();
-});
-
-// פתרון עוקף - רישום ישיר של שער התשלום ב-checkout
-add_action('woocommerce_checkout_before_customer_details', function() {
-    if (!class_exists('WC_Payment_Gateway')) {
-        error_log('WC_Payment_Gateway class not available on checkout page');
-        return;
-    }
-    
-    if (!class_exists('WC_iCount_Gateway')) {
-        require_once ADPRO_ESIM_PATH . 'includes/class-wc-icount-gateway.php';
-    }
-    
-    // וודא שהשער פעיל
-    global $wc_icount_gateway_active;
-    if (!isset($wc_icount_gateway_active) || !$wc_icount_gateway_active) {
-        // צור שער ידנית
-        $gateway = new WC_iCount_Gateway();
-        
-        // הוסף לרשימת שערי התשלום הזמינים
-        if (function_exists('WC') && isset(WC()->payment_gateways) && method_exists(WC()->payment_gateways, 'payment_gateways')) {
-            $available_gateways = WC()->payment_gateways->payment_gateways();
-            $available_gateways['icount_gateway'] = $gateway;
-            
-            // עדכן את הרשימה
-            WC()->payment_gateways->payment_gateways = $available_gateways;
-            
-            $wc_icount_gateway_active = true;
-            error_log('iCount gateway manually added to available gateways during checkout');
-        }
-    }
 });
