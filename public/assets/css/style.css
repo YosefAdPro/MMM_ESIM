@@ -652,38 +652,213 @@ select:focus {
     text-align: center;
 }
 
-/* התאמה למסכים קטנים */
+/* התאמות למובייל */
 @media (max-width: 768px) {
-    .country-header h1 {
-        font-size: 1.8rem;
-    }
-	
-	
-    
-    .packages-list {
-        grid-template-columns: 1fr;
+    /* התאמת אזור החיפוש */
+    .search-container {
+        padding: 15px 10px;
+        margin-bottom: 20px;
     }
     
+    .search-container h2 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+    
+    /* התאמת שדה החיפוש */
+    .search-box {
+        max-width: 100%;
+    }
+    
+    #country-search {
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+    
+    /* התאמת מקסימום גובה לתיבת ההצעות */
+    #country-suggestions {
+        max-height: 200px;
+    }
+    
+    /* התאמת רשת המדינות */
+    .country-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 10px;
+    }
+    
+    .country-item {
+        padding: 8px 5px;
+    }
+    
+    .country-item img {
+        width: 32px;
+        height: 24px;
+        margin-bottom: 6px;
+    }
+    
+    .country-item span {
+        font-size: 0.8rem;
+    }
+    
+    /* סינון חבילות במובייל */
+    .package-filters {
+        padding: 15px;
+        position: relative;
+        z-index: 50;
+    }
+    
+    .package-filters h3 {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+    }
+    
+
+    
+    .filter-mobile-toggle:hover {
+        background-color: #0055b3;
+    }
+    
+    /* הסתרת תוכן הסינון בברירת מחדל */
+    .filter-content {
+        display: none;
+    }
+    
+    /* הצגת תוכן הסינון כאשר הוא פתוח */
+    .filters-open .filter-content {
+        display: block;
+    }
+    
+    /* התאמת שורת הסינון */
     .filter-row {
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
     }
     
     .filter-group {
         width: 100%;
+        margin-bottom: 12px;
     }
     
+    select {
+        padding: 10px;
+    }
+    
+    .reset-button {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    /* התאמת חבילות */
+    .packages-list {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* חבילות קטנות יותר במובייל */
+    .package {
+        max-height: none;
+        margin-bottom: 15px;
+    }
+    
+    .package h2 {
+        font-size: 0.95rem;
+        min-height: auto;
+        padding: 10px;
+        line-height: 1.3;
+    }
+    
+    .package-details {
+        padding: 12px;
+    }
+    
+    .price {
+        font-size: 1.6rem;
+        margin-bottom: 10px;
+    }
+    
+    .data, .validity, .provider {
+        margin: 8px 0;
+        font-size: 0.85rem;
+        gap: 5px;
+    }
+    
+    .data strong, .validity strong, .provider strong {
+        min-width: 60px;
+    }
+    
+    .package-description {
+        margin-top: 10px;
+        padding-top: 10px;
+        font-size: 0.8rem;
+    }
+    
+    /* רשתות וארצות נתמכות - תצוגה קומפקטית */
+    .country-networks, .supported-countries {
+        margin-top: 10px;
+        padding: 10px;
+    }
+    
+    .country-networks h3, .supported-countries h3 {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+    
+    .networks-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 5px;
+    }
+    
+    .network-item {
+        padding: 5px;
+    }
+    
+    .network-name {
+        font-size: 0.75rem;
+    }
+    
+    .country-flags {
+        gap: 5px;
+    }
+    
+    .buy-now {
+        padding: 12px;
+        font-size: 1rem;
+    }
+    
+    /* התאמות מודאל */
     .modal-content {
-        padding: 20px;
+        padding: 15px;
+        width: 95%;
     }
     
-    .modal-details {
-        flex-direction: column;
+    #package-modal-content h2 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
     }
-    
+}
+
+@media (max-width: 380px) {
     .country-grid {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
     }
+    
+    .country-item img {
+        width: 28px;
+        height: 21px;
+    }
+    
+    .country-item span {
+        font-size: 0.75rem;
+    }
+    
+    .package h2 {
+        font-size: 0.9rem;
+    }
+}
+
+/* Default desktop styles for filter toggle button - hide by default */
+.filter-mobile-toggle {
+    display: none;
 }
 
 /* חבילה מוסתרת */

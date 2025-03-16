@@ -133,53 +133,51 @@ if ($country_data) {
         <?php endif; ?>
 
         <!-- פילטר חבילות -->
-        <?php if ($packages && !empty($packages)) : ?>
-<!-- פילטר חבילות - קוד מעודכן עם סינון מחיר -->
-
+ <!-- פילטר חבילות - קוד מתוקן עם סינון מחיר -->
+<?php if ($packages && !empty($packages)) : ?>
     <div class="package-filters">
-<div class="package-filters">
-    <h3>סינון חבילות</h3>
-    
-    <!-- כפתור סינון למובייל -->
-    <button class="filter-mobile-toggle">פתח סינון מתקדם</button>
-    
-    <!-- תוכן הסינון -->
-    <div class="filter-content">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="data-filter">כמות נתונים:</label>
-                <select id="data-filter">
-                    <option value="all">הכל</option>
-                    <option value="1-5">1GB - 5GB</option>
-                    <option value="5-10">5GB - 10GB</option>
-                    <option value="10-20">10GB - 20GB</option>
-                    <option value="20-50">20GB - 50GB</option>
-                    <option value="50+">50GB ומעלה</option>
-                </select>
+        <h3>סינון חבילות</h3>
+        
+        <!-- כפתור סינון למובייל -->
+        <button type="button" class="filter-mobile-toggle">פתח סינון מתקדם</button>
+        
+        <!-- תוכן הסינון -->
+        <div class="filter-content">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="data-filter">כמות נתונים:</label>
+                    <select id="data-filter">
+                        <option value="all">הכל</option>
+                        <option value="1-5">1GB - 5GB</option>
+                        <option value="5-10">5GB - 10GB</option>
+                        <option value="10-20">10GB - 20GB</option>
+                        <option value="20-50">20GB - 50GB</option>
+                        <option value="50+">50GB ומעלה</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="duration-filter">זמן:</label>
+                    <select id="duration-filter">
+                        <option value="all">הכל</option>
+                        <option value="1-7">עד שבוע</option>
+                        <option value="7-14">1-2 שבועות</option>
+                        <option value="14-30">עד חודש</option>
+                        <option value="30-90">1-3 חודשים</option>
+                        <option value="90+">3+ חודשים</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="price-filter">מחיר:</label>
+                    <select id="price-filter">
+                        <option value="all">הכל</option>
+                        <option value="low-to-high">מהזול ליקר</option>
+                        <option value="high-to-low">מהיקר לזול</option>
+                    </select>
+                </div>
+                <button id="reset-filters" class="reset-button">איפוס סינון</button>
             </div>
-            <div class="filter-group">
-                <label for="duration-filter">זמן:</label>
-                <select id="duration-filter">
-                    <option value="all">הכל</option>
-                    <option value="1-7">עד שבוע</option>
-                    <option value="7-14">1-2 שבועות</option>
-                    <option value="14-30">עד חודש</option>
-                    <option value="30-90">1-3 חודשים</option>
-                    <option value="90+">3+ חודשים</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="price-filter">מחיר:</label>
-                <select id="price-filter">
-                    <option value="all">הכל</option>
-                    <option value="low-to-high">מהזול ליקר</option>
-                    <option value="high-to-low">מהיקר לזול</option>
-                </select>
-            </div>
-            <button id="reset-filters" class="reset-button">איפוס סינון</button>
         </div>
     </div>
-</div>
 <?php endif; ?>
 
         <?php if ($packages && !empty($packages)) : ?>

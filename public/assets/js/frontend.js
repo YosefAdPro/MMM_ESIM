@@ -1,130 +1,160 @@
 jQuery(document).ready(function($) {
-	
-
-$('.filter-mobile-toggle').on('click', function() {
-    $('.package-filters').toggleClass('filters-open');
+    console.log("Script loaded successfully"); // בדיקת טעינה
     
-    // שינוי טקסט הכפתור
-    if ($('.package-filters').hasClass('filters-open')) {
-        $(this).text('סגור סינון');
-    } else {
-        $(this).text('פתח סינון מתקדם');
-    }
-});
-
-    // סינון חבילות
-
-if ($('.packages-list').length) {
+    // ==== Mobile Filter Toggle Functions ====
+    console.log("Filter-mobile-toggle elements:", $('.filter-mobile-toggle').length); // בדיקה
     
-    function filterPackages() {
-        var dataFilter = $('#data-filter').val();
-        var durationFilter = $('#duration-filter').val();
-        var priceFilter = $('#price-filter').val();
+    // Toggle filters on mobile
+    $(document).on('click', '.filter-mobile-toggle', function() {
+        console.log("Filter toggle clicked"); // בדיקה
+        $('.package-filters').toggleClass('filters-open');
         
-        // עבור על כל החבילות
-        $('.package').each(function() {
-            var $package = $(this);
-            var dataText = $package.find('.data').text();
-            var durationText = $package.find('.validity').text();
-            
-            // חלץ את כמות הנתונים (GB)
-            var dataMatch = dataText.match(/(\d+(\.\d+)?)\s*GB/i);
-            var dataAmount = dataMatch ? parseFloat(dataMatch[1]) : 0;
-            
-            // חלץ את משך הזמן (ימים)
-            var durationMatch = durationText.match(/(\d+)\s*ימים/i);
-            var durationDays = durationMatch ? parseInt(durationMatch[1]) : 0;
-            
-            var showByData = dataFilter === 'all';
-            var showByDuration = durationFilter === 'all';
-            
-            // בדיקת סינון לפי נתונים
-            if (!showByData) {
-                if (dataFilter === '1-5' && dataAmount >= 1 && dataAmount <= 5) showByData = true;
-                else if (dataFilter === '5-10' && dataAmount > 5 && dataAmount <= 10) showByData = true;
-                else if (dataFilter === '10-20' && dataAmount > 10 && dataAmount <= 20) showByData = true;
-                else if (dataFilter === '20-50' && dataAmount > 20 && dataAmount <= 50) showByData = true;
-                else if (dataFilter === '50+' && dataAmount > 50) showByData = true;
-            }
-            
-            // בדיקת סינון לפי זמן
-            if (!showByDuration) {
-                if (durationFilter === '1-7' && durationDays >= 1 && durationDays <= 7) showByDuration = true;
-                else if (durationFilter === '7-14' && durationDays > 7 && durationDays <= 14) showByDuration = true;
-                else if (durationFilter === '14-30' && durationDays > 14 && durationDays <= 30) showByDuration = true;
-                else if (durationFilter === '30-90' && durationDays > 30 && durationDays <= 90) showByDuration = true;
-                else if (durationFilter === '90+' && durationDays > 90) showByDuration = true;
-            }
-            
-            // הצג או הסתר את החבילה
-            if (showByData && showByDuration) {
-                $package.removeClass('hidden-package');
-            } else {
-                $package.addClass('hidden-package');
-            }
-        });
-        
-        // בדוק אם אין חבילות מוצגות לאחר סינון
-        if ($('.package:not(.hidden-package)').length === 0) {
-            if ($('.no-filtered-packages').length === 0) {
-                $('.packages-list').append('<div class="no-filtered-packages"><p>לא נמצאו חבילות העונות לקריטריוני הסינון.</p></div>');
-            }
+        // Change button text based on state
+        if ($('.package-filters').hasClass('filters-open')) {
+            $(this).text('סגור סינון');
         } else {
-            $('.no-filtered-packages').remove();
+            $(this).text('פתח סינון מתקדם');
         }
-    }
-    
-    // פונקציה חדשה למיון לפי מחיר
-    function sortPackagesByPrice() {
-        var sortDirection = $('#price-filter').val();
-        
-        if (sortDirection === 'all') {
-            return; // אין צורך במיון
-        }
-        
-        var $packagesContainer = $('.packages-list');
-        var $packages = $packagesContainer.children('.package').get();
-        
-        $packages.sort(function(a, b) {
-            var priceA = parseFloat($(a).find('.price').text().replace(/[^\d.]/g, ''));
-            var priceB = parseFloat($(b).find('.price').text().replace(/[^\d.]/g, ''));
-            
-            if (isNaN(priceA)) priceA = 0;
-            if (isNaN(priceB)) priceB = 0;
-            
-            if (sortDirection === 'low-to-high') {
-                return priceA - priceB;
-            } else {
-                return priceB - priceA;
-            }
-        });
-        
-        // החלף את הסדר בדף
-        $.each($packages, function(i, item) {
-            $packagesContainer.append(item);
-        });
-    }
-    
-    // אירועי שינוי בסינון
-    $('#data-filter, #duration-filter').on('change', filterPackages);
-    
-    // אירוע שינוי במיון לפי מחיר
-    $('#price-filter').on('change', sortPackagesByPrice);
-    
-    // איפוס סינון
-    $('#reset-filters').on('click', function() {
-        $('#data-filter, #duration-filter').val('all');
-        $('#price-filter').val('all');
-        $('.package').removeClass('hidden-package');
-        $('.no-filtered-packages').remove();
-        
-        // רענן את סדר החבילות המקורי (אפשרי רק אם שומרים סדר מקורי)
-        // לצורך כך צריך להוסיף נתון מקורי לכל חבילה או לרענן את הדף
     });
-}
-
-
-    // חיפוש מדינות
+    
+    // Close filter dropdown when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.package-filters').length && 
+            !$(e.target).is('.filter-mobile-toggle') && 
+            $('.package-filters').hasClass('filters-open') &&
+            window.innerWidth <= 768) {
+            $('.package-filters').removeClass('filters-open');
+            $('.filter-mobile-toggle').text('פתח סינון מתקדם');
+        }
+    });
+    
+    // Check screen size and adjust filters visibility
+    function checkScreenSize() {
+        console.log("Checking screen size, width:", window.innerWidth); // בדיקה
+        if (window.innerWidth > 768) {
+            $('.filter-content').show();
+        } else if (!$('.package-filters').hasClass('filters-open')) {
+            $('.filter-content').hide();
+        }
+    }
+    
+    // Run on page load
+    checkScreenSize();
+    
+    // Run on window resize
+    $(window).resize(function() {
+        checkScreenSize();
+    });
+    
+    // ==== Package Filtering Functions ====
+    
+    if ($('.packages-list').length) {
+        function filterPackages() {
+            var dataFilter = $('#data-filter').val();
+            var durationFilter = $('#duration-filter').val();
+            var priceFilter = $('#price-filter').val();
+            
+            // עבור על כל החבילות
+            $('.package').each(function() {
+                var $package = $(this);
+                var dataText = $package.find('.data').text();
+                var durationText = $package.find('.validity').text();
+                
+                // חלץ את כמות הנתונים (GB)
+                var dataMatch = dataText.match(/(\d+(\.\d+)?)\s*GB/i);
+                var dataAmount = dataMatch ? parseFloat(dataMatch[1]) : 0;
+                
+                // חלץ את משך הזמן (ימים)
+                var durationMatch = durationText.match(/(\d+)\s*ימים/i);
+                var durationDays = durationMatch ? parseInt(durationMatch[1]) : 0;
+                
+                var showByData = dataFilter === 'all';
+                var showByDuration = durationFilter === 'all';
+                
+                // בדיקת סינון לפי נתונים
+                if (!showByData) {
+                    if (dataFilter === '1-5' && dataAmount >= 1 && dataAmount <= 5) showByData = true;
+                    else if (dataFilter === '5-10' && dataAmount > 5 && dataAmount <= 10) showByData = true;
+                    else if (dataFilter === '10-20' && dataAmount > 10 && dataAmount <= 20) showByData = true;
+                    else if (dataFilter === '20-50' && dataAmount > 20 && dataAmount <= 50) showByData = true;
+                    else if (dataFilter === '50+' && dataAmount > 50) showByData = true;
+                }
+                
+                // בדיקת סינון לפי זמן
+                if (!showByDuration) {
+                    if (durationFilter === '1-7' && durationDays >= 1 && durationDays <= 7) showByDuration = true;
+                    else if (durationFilter === '7-14' && durationDays > 7 && durationDays <= 14) showByDuration = true;
+                    else if (durationFilter === '14-30' && durationDays > 14 && durationDays <= 30) showByDuration = true;
+                    else if (durationFilter === '30-90' && durationDays > 30 && durationDays <= 90) showByDuration = true;
+                    else if (durationFilter === '90+' && durationDays > 90) showByDuration = true;
+                }
+                
+                // הצג או הסתר את החבילה
+                if (showByData && showByDuration) {
+                    $package.removeClass('hidden-package');
+                } else {
+                    $package.addClass('hidden-package');
+                }
+            });
+            
+            // בדוק אם אין חבילות מוצגות לאחר סינון
+            if ($('.package:not(.hidden-package)').length === 0) {
+                if ($('.no-filtered-packages').length === 0) {
+                    $('.packages-list').append('<div class="no-filtered-packages"><p>לא נמצאו חבילות העונות לקריטריוני הסינון.</p></div>');
+                }
+            } else {
+                $('.no-filtered-packages').remove();
+            }
+        }
+        
+        // פונקציה למיון לפי מחיר
+        function sortPackagesByPrice() {
+            var sortDirection = $('#price-filter').val();
+            
+            if (sortDirection === 'all') {
+                return; // אין צורך במיון
+            }
+            
+            var $packagesContainer = $('.packages-list');
+            var $packages = $packagesContainer.children('.package').get();
+            
+            $packages.sort(function(a, b) {
+                var priceA = parseFloat($(a).find('.price').text().replace(/[^\d.]/g, ''));
+                var priceB = parseFloat($(b).find('.price').text().replace(/[^\d.]/g, ''));
+                
+                if (isNaN(priceA)) priceA = 0;
+                if (isNaN(priceB)) priceB = 0;
+                
+                if (sortDirection === 'low-to-high') {
+                    return priceA - priceB;
+                } else {
+                    return priceB - priceA;
+                }
+            });
+            
+            // החלף את הסדר בדף
+            $.each($packages, function(i, item) {
+                $packagesContainer.append(item);
+            });
+        }
+        
+        // אירועי שינוי בסינון
+        $('#data-filter, #duration-filter').on('change', filterPackages);
+        
+        // אירוע שינוי במיון לפי מחיר
+        $('#price-filter').on('change', sortPackagesByPrice);
+        
+        // איפוס סינון
+        $('#reset-filters').on('click', function() {
+            $('#data-filter, #duration-filter').val('all');
+            $('#price-filter').val('all');
+            $('.package').removeClass('hidden-package');
+            $('.no-filtered-packages').remove();
+        });
+    }
+    
+    // ==== Country Search Functions ====
+    
     var countries = AdPro_esim_ajax.countries;
     var $searchInput = $('#country-search');
     var $suggestionsContainer = $('#country-suggestions');
@@ -143,7 +173,7 @@ if ($('.packages-list').length) {
                 matches.push({
                     hebrew: hebrew,
                     iso: countries[hebrew].iso,
-                    slug: countries[hebrew].english.toLowerCase()
+                    slug: countries[hebrew].slug
                 });
             }
         });
@@ -170,17 +200,20 @@ if ($('.packages-list').length) {
         }
     });
     
+    // Click on suggestion
     $(document).on('click', '.suggestion', function() {
         var slug = $(this).data('country');
         window.location.href = AdPro_esim_ajax.site_url + '/esim/' + slug;
     });
     
+    // Hide suggestions when clicking outside
     $(document).on('click', function(e) {
         if (!$(e.target).closest('.search-box').length) {
             $suggestionsContainer.hide();
         }
     });
     
+    // Keyboard navigation for suggestions
     $searchInput.on('keydown', function(e) {
         var $suggestions = $('.suggestion');
         var $selected = $('.suggestion.selected');
@@ -195,7 +228,9 @@ if ($('.packages-list').length) {
             $suggestions.removeClass('selected');
             $current.addClass('selected');
             // גלילה אוטומטית להצעה שנבחרה
-            $current[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if ($current.length) {
+                $current[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
             return false;
         }
         
@@ -207,7 +242,9 @@ if ($('.packages-list').length) {
             }
             $suggestions.removeClass('selected');
             $current.addClass('selected');
-            $current[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if ($current.length) {
+                $current[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
             return false;
         }
         
@@ -216,7 +253,9 @@ if ($('.packages-list').length) {
             $selected.click();
         }
     });
-
+    
+    // ==== Package Modal Functions ====
+    
     // פתיחת המודאל של פרטי החבילה בלחיצה על החבילה
     $(document).on('click', '.package-clickable', function(e) {
         // מניעת הפעלה אם לחצו על הכפתור "רכוש עכשיו"
@@ -277,7 +316,7 @@ if ($('.packages-list').length) {
             }
         }
         
-        // בניית כותרת מותאמת אישית - החלק החדש!
+        // בניית כותרת מותאמת אישית
         var customTitle = '';
         var countriesCount = packageDetails.countries ? packageDetails.countries.length : 0;
 
@@ -379,12 +418,11 @@ if ($('.packages-list').length) {
         
         // כפתור רכישה
         modalContent += '<form method="post" action="' + adminAjaxUrl.replace('admin-ajax.php', 'admin-post.php') + '">';
-modalContent += '<input type="hidden" name="action" value="AdPro_process_package">';
-modalContent += '<input type="hidden" name="package_id" value="' + packageDetails.productId + '">';
-modalContent += '<input type="hidden" name="country" value="' + hebrewCountry + '">';
-modalContent += '<button type="submit" class="buy-now-modal">רכוש עכשיו</button>';
-modalContent += '</form>';
-        modalContent += '</div>';
+        modalContent += '<input type="hidden" name="action" value="AdPro_process_package">';
+        modalContent += '<input type="hidden" name="package_id" value="' + packageDetails.productId + '">';
+        modalContent += '<input type="hidden" name="country" value="' + hebrewCountry + '">';
+        modalContent += '<button type="submit" class="buy-now-modal">רכוש עכשיו</button>';
+        modalContent += '</form>';
         
         // הזנת התוכן למודאל והצגתו
         $('#package-modal-content').html(modalContent);
