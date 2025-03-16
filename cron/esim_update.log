@@ -1,343 +1,325 @@
 PHP Warning:  Constant WP_DEBUG already defined in /var/www/html/wp-config.php on line 105
 PHP Warning:  Constant WP_DEBUG_LOG already defined in /var/www/html/wp-config.php on line 106
 PHP Warning:  Constant WP_DEBUG_DISPLAY already defined in /var/www/html/wp-config.php on line 107
-[2025-03-15 21:30:38] Starting eSIM packages update...
+[2025-03-16 11:14:08] Starting eSIM packages update...
 Starting eSIM packages update...
-[2025-03-15 21:30:38] Requesting all eSIM packages...
+[2025-03-16 11:14:08] Requesting all eSIM packages...
 Requesting all eSIM packages...
-[2025-03-15 21:30:39] Retrieved 376 packages successfully
-Retrieved 376 packages successfully
-[2025-03-15 21:30:39] Organizing packages by country...
+[2025-03-16 11:14:08] Retrieved 356 packages successfully
+Retrieved 356 packages successfully
+[2025-03-16 11:14:08] Organizing packages by country...
 Organizing packages by country...
-[2025-03-15 21:30:39] No 'country' field found, checking 'countries' array...
+[2025-03-16 11:14:08] No 'country' field found, checking 'countries' array...
 No 'country' field found, checking 'countries' array...
-[2025-03-15 21:30:39] Saved 19 packages for country VN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vn.json
-Saved 19 packages for country VN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vn.json
-[2025-03-15 21:30:39] Saved 29 packages for country TH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/th.json
-Saved 29 packages for country TH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/th.json
-[2025-03-15 21:30:39] Saved 31 packages for country BG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bg.json
-Saved 31 packages for country BG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bg.json
-[2025-03-15 21:30:39] Saved 30 packages for country ID to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/id.json
-Saved 30 packages for country ID to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/id.json
-[2025-03-15 21:30:39] Saved 36 packages for country FR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fr.json
-Saved 36 packages for country FR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fr.json
-[2025-03-15 21:30:39] Saved 18 packages for country JP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jp.json
-Saved 18 packages for country JP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jp.json
-[2025-03-15 21:30:39] Saved 32 packages for country GR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gr.json
-Saved 32 packages for country GR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gr.json
-[2025-03-15 21:30:39] Saved 32 packages for country PT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pt.json
-Saved 32 packages for country PT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pt.json
-[2025-03-15 21:30:39] Saved 34 packages for country ES to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/es.json
-Saved 34 packages for country ES to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/es.json
-[2025-03-15 21:30:39] Saved 36 packages for country GB to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gb.json
-Saved 36 packages for country GB to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gb.json
-[2025-03-15 21:30:39] Saved 50 packages for country TR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tr.json
-Saved 50 packages for country TR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tr.json
-[2025-03-15 21:30:39] Saved 32 packages for country KR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kr.json
-Saved 32 packages for country KR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kr.json
-[2025-03-15 21:30:39] Saved 31 packages for country MY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/my.json
-Saved 31 packages for country MY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/my.json
-[2025-03-15 21:30:39] Saved 31 packages for country SG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sg.json
-Saved 31 packages for country SG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sg.json
-[2025-03-15 21:30:39] Saved 22 packages for country TW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tw.json
-Saved 22 packages for country TW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tw.json
-[2025-03-15 21:30:39] Saved 25 packages for country MD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/md.json
-Saved 25 packages for country MD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/md.json
-[2025-03-15 21:30:39] Saved 25 packages for country UA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ua.json
-Saved 25 packages for country UA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ua.json
-[2025-03-15 21:30:39] Saved 33 packages for country CN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cn.json
-Saved 33 packages for country CN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cn.json
-[2025-03-15 21:30:39] Saved 29 packages for country IT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/it.json
-Saved 29 packages for country IT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/it.json
-[2025-03-15 21:30:39] Saved 16 packages for country SM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sm.json
+[2025-03-16 11:14:08] Saved 6 packages for country VN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vn.json
+Saved 6 packages for country VN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vn.json
+[2025-03-16 11:14:08] Saved 12 packages for country TH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/th.json
+Saved 12 packages for country TH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/th.json
+[2025-03-16 11:14:08] Saved 27 packages for country BG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bg.json
+Saved 27 packages for country BG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bg.json
+[2025-03-16 11:14:08] Saved 13 packages for country ID to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/id.json
+Saved 13 packages for country ID to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/id.json
+[2025-03-16 11:14:08] Saved 32 packages for country FR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fr.json
+Saved 32 packages for country FR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fr.json
+[2025-03-16 11:14:08] Saved 17 packages for country JP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jp.json
+Saved 17 packages for country JP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jp.json
+[2025-03-16 11:14:08] Saved 28 packages for country GR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gr.json
+Saved 28 packages for country GR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gr.json
+[2025-03-16 11:14:08] Saved 28 packages for country PT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pt.json
+Saved 28 packages for country PT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pt.json
+[2025-03-16 11:14:08] Saved 30 packages for country ES to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/es.json
+Saved 30 packages for country ES to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/es.json
+[2025-03-16 11:14:08] Saved 32 packages for country GB to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gb.json
+Saved 32 packages for country GB to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gb.json
+[2025-03-16 11:14:08] Saved 46 packages for country TR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tr.json
+Saved 46 packages for country TR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tr.json
+[2025-03-16 11:14:08] Saved 19 packages for country KR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kr.json
+Saved 19 packages for country KR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kr.json
+[2025-03-16 11:14:08] Saved 14 packages for country MY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/my.json
+Saved 14 packages for country MY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/my.json
+[2025-03-16 11:14:08] Saved 14 packages for country SG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sg.json
+Saved 14 packages for country SG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sg.json
+[2025-03-16 11:14:08] Saved 9 packages for country TW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tw.json
+Saved 9 packages for country TW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tw.json
+[2025-03-16 11:14:08] Saved 21 packages for country MD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/md.json
+Saved 21 packages for country MD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/md.json
+[2025-03-16 11:14:08] Saved 21 packages for country UA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ua.json
+Saved 21 packages for country UA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ua.json
+[2025-03-16 11:14:08] Saved 27 packages for country CN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cn.json
+Saved 27 packages for country CN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cn.json
+[2025-03-16 11:14:08] Saved 25 packages for country IT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/it.json
+Saved 25 packages for country IT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/it.json
+[2025-03-16 11:14:08] Saved 16 packages for country SM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sm.json
 Saved 16 packages for country SM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sm.json
-[2025-03-15 21:30:39] Saved 21 packages for country VA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/va.json
+[2025-03-16 11:14:08] Saved 21 packages for country VA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/va.json
 Saved 21 packages for country VA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/va.json
-[2025-03-15 21:30:39] Saved 34 packages for country DE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/de.json
-Saved 34 packages for country DE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/de.json
-[2025-03-15 21:30:39] Saved 38 packages for country US to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us.json
-Saved 38 packages for country US to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us.json
-[2025-03-15 21:30:39] Saved 26 packages for country US-HI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us-hi.json
-Saved 26 packages for country US-HI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us-hi.json
-[2025-03-15 21:30:39] Saved 10 packages for country BR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/br.json
+[2025-03-16 11:14:08] Saved 30 packages for country DE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/de.json
+Saved 30 packages for country DE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/de.json
+[2025-03-16 11:14:08] Saved 34 packages for country US to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us.json
+Saved 34 packages for country US to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us.json
+[2025-03-16 11:14:08] Saved 22 packages for country US-HI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us-hi.json
+Saved 22 packages for country US-HI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/us-hi.json
+[2025-03-16 11:14:08] Saved 10 packages for country BR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/br.json
 Saved 10 packages for country BR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/br.json
-[2025-03-15 21:30:39] Saved 25 packages for country MO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mo.json
-Saved 25 packages for country MO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mo.json
-[2025-03-15 21:30:39] Saved 26 packages for country AU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/au.json
-Saved 26 packages for country AU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/au.json
-[2025-03-15 21:30:39] Saved 33 packages for country HK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hk.json
-Saved 33 packages for country HK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hk.json
-[2025-03-15 21:30:39] Saved 24 packages for country NZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nz.json
-Saved 24 packages for country NZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nz.json
-[2025-03-15 21:30:39] Saved 32 packages for country CH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ch.json
-Saved 32 packages for country CH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ch.json
-[2025-03-15 21:30:39] Saved 25 packages for country AL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/al.json
-Saved 25 packages for country AL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/al.json
-[2025-03-15 21:30:39] Saved 28 packages for country AT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/at.json
-Saved 28 packages for country AT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/at.json
-[2025-03-15 21:30:39] Saved 28 packages for country BE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/be.json
-Saved 28 packages for country BE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/be.json
-[2025-03-15 21:30:39] Saved 28 packages for country HR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hr.json
-Saved 28 packages for country HR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hr.json
-[2025-03-15 21:30:39] Saved 28 packages for country CY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cy.json
-Saved 28 packages for country CY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cy.json
-[2025-03-15 21:30:39] Saved 28 packages for country CZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cz.json
-Saved 28 packages for country CZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cz.json
-[2025-03-15 21:30:39] Saved 28 packages for country DK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dk.json
-Saved 28 packages for country DK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dk.json
-[2025-03-15 21:30:39] Saved 28 packages for country EE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ee.json
-Saved 28 packages for country EE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ee.json
-[2025-03-15 21:30:39] Saved 28 packages for country FI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fi.json
-Saved 28 packages for country FI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fi.json
-[2025-03-15 21:30:39] Saved 28 packages for country HU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hu.json
-Saved 28 packages for country HU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hu.json
-[2025-03-15 21:30:39] Saved 27 packages for country IS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/is.json
-Saved 27 packages for country IS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/is.json
-[2025-03-15 21:30:39] Saved 28 packages for country IE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ie.json
-Saved 28 packages for country IE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ie.json
-[2025-03-15 21:30:39] Saved 31 packages for country IL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/il.json
-Saved 31 packages for country IL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/il.json
-[2025-03-15 21:30:39] Saved 28 packages for country LV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lv.json
-Saved 28 packages for country LV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lv.json
-[2025-03-15 21:30:39] Saved 28 packages for country LI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/li.json
-Saved 28 packages for country LI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/li.json
-[2025-03-15 21:30:39] Saved 28 packages for country LT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lt.json
-Saved 28 packages for country LT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lt.json
-[2025-03-15 21:30:39] Saved 28 packages for country LU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lu.json
-Saved 28 packages for country LU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lu.json
-[2025-03-15 21:30:39] Saved 28 packages for country MT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mt.json
-Saved 28 packages for country MT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mt.json
-[2025-03-15 21:30:39] Saved 25 packages for country ME to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/me.json
-Saved 25 packages for country ME to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/me.json
-[2025-03-15 21:30:39] Saved 28 packages for country NL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nl.json
-Saved 28 packages for country NL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nl.json
-[2025-03-15 21:30:39] Saved 26 packages for country NO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/no.json
-Saved 26 packages for country NO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/no.json
-[2025-03-15 21:30:39] Saved 28 packages for country PL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pl.json
-Saved 28 packages for country PL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pl.json
-[2025-03-15 21:30:39] Saved 28 packages for country RO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ro.json
-Saved 28 packages for country RO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ro.json
-[2025-03-15 21:30:39] Saved 28 packages for country SK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sk.json
-Saved 28 packages for country SK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sk.json
-[2025-03-15 21:30:39] Saved 28 packages for country SI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/si.json
-Saved 28 packages for country SI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/si.json
-[2025-03-15 21:30:39] Saved 28 packages for country SE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/se.json
-Saved 28 packages for country SE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/se.json
-[2025-03-15 21:30:39] Saved 7 packages for country AM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/am.json
-Saved 7 packages for country AM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/am.json
-[2025-03-15 21:30:39] Saved 8 packages for country KZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kz.json
-Saved 8 packages for country KZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kz.json
-[2025-03-15 21:30:39] Saved 7 packages for country KG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kg.json
-Saved 7 packages for country KG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kg.json
-[2025-03-15 21:30:39] Saved 11 packages for country UZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/uz.json
-Saved 11 packages for country UZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/uz.json
-[2025-03-15 21:30:39] Saved 8 packages for country MX to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mx.json
+[2025-03-16 11:14:08] Saved 16 packages for country MO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mo.json
+Saved 16 packages for country MO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mo.json
+[2025-03-16 11:14:08] Saved 18 packages for country AU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/au.json
+Saved 18 packages for country AU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/au.json
+[2025-03-16 11:14:08] Saved 20 packages for country HK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hk.json
+Saved 20 packages for country HK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hk.json
+[2025-03-16 11:14:08] Saved 17 packages for country NZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nz.json
+Saved 17 packages for country NZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nz.json
+[2025-03-16 11:14:08] Saved 28 packages for country CH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ch.json
+Saved 28 packages for country CH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ch.json
+[2025-03-16 11:14:08] Saved 21 packages for country AL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/al.json
+Saved 21 packages for country AL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/al.json
+[2025-03-16 11:14:08] Saved 24 packages for country AT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/at.json
+Saved 24 packages for country AT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/at.json
+[2025-03-16 11:14:08] Saved 24 packages for country BE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/be.json
+Saved 24 packages for country BE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/be.json
+[2025-03-16 11:14:08] Saved 24 packages for country HR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hr.json
+Saved 24 packages for country HR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hr.json
+[2025-03-16 11:14:08] Saved 24 packages for country CY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cy.json
+Saved 24 packages for country CY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cy.json
+[2025-03-16 11:14:08] Saved 24 packages for country CZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cz.json
+Saved 24 packages for country CZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cz.json
+[2025-03-16 11:14:08] Saved 24 packages for country DK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dk.json
+Saved 24 packages for country DK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dk.json
+[2025-03-16 11:14:08] Saved 24 packages for country EE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ee.json
+Saved 24 packages for country EE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ee.json
+[2025-03-16 11:14:08] Saved 24 packages for country FI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fi.json
+Saved 24 packages for country FI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fi.json
+[2025-03-16 11:14:08] Saved 24 packages for country HU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hu.json
+Saved 24 packages for country HU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hu.json
+[2025-03-16 11:14:08] Saved 23 packages for country IS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/is.json
+Saved 23 packages for country IS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/is.json
+[2025-03-16 11:14:08] Saved 24 packages for country IE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ie.json
+Saved 24 packages for country IE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ie.json
+[2025-03-16 11:14:08] Saved 26 packages for country IL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/il.json
+Saved 26 packages for country IL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/il.json
+[2025-03-16 11:14:08] Saved 24 packages for country LV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lv.json
+Saved 24 packages for country LV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lv.json
+[2025-03-16 11:14:08] Saved 24 packages for country LI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/li.json
+Saved 24 packages for country LI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/li.json
+[2025-03-16 11:14:08] Saved 24 packages for country LT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lt.json
+Saved 24 packages for country LT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lt.json
+[2025-03-16 11:14:08] Saved 24 packages for country LU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lu.json
+Saved 24 packages for country LU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lu.json
+[2025-03-16 11:14:08] Saved 24 packages for country MT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mt.json
+Saved 24 packages for country MT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mt.json
+[2025-03-16 11:14:08] Saved 21 packages for country ME to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/me.json
+Saved 21 packages for country ME to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/me.json
+[2025-03-16 11:14:08] Saved 24 packages for country NL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nl.json
+Saved 24 packages for country NL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/nl.json
+[2025-03-16 11:14:08] Saved 22 packages for country NO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/no.json
+Saved 22 packages for country NO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/no.json
+[2025-03-16 11:14:08] Saved 24 packages for country PL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pl.json
+Saved 24 packages for country PL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pl.json
+[2025-03-16 11:14:08] Saved 24 packages for country RO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ro.json
+Saved 24 packages for country RO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ro.json
+[2025-03-16 11:14:08] Saved 24 packages for country SK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sk.json
+Saved 24 packages for country SK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sk.json
+[2025-03-16 11:14:08] Saved 24 packages for country SI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/si.json
+Saved 24 packages for country SI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/si.json
+[2025-03-16 11:14:08] Saved 24 packages for country SE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/se.json
+Saved 24 packages for country SE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/se.json
+[2025-03-16 11:14:08] Saved 3 packages for country AM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/am.json
+Saved 3 packages for country AM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/am.json
+[2025-03-16 11:14:08] Saved 8 packages for country MX to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mx.json
 Saved 8 packages for country MX to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mx.json
-[2025-03-15 21:30:39] Saved 13 packages for country PH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ph.json
-Saved 13 packages for country PH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ph.json
-[2025-03-15 21:30:39] Saved 7 packages for country AD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ad.json
-Saved 7 packages for country AD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ad.json
-[2025-03-15 21:30:39] Saved 1 packages for country GI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gi.json
+[2025-03-16 11:14:08] Saved 8 packages for country PH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ph.json
+Saved 8 packages for country PH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ph.json
+[2025-03-16 11:14:08] Saved 3 packages for country AD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ad.json
+Saved 3 packages for country AD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ad.json
+[2025-03-16 11:14:08] Saved 1 packages for country GI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gi.json
 Saved 1 packages for country GI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gi.json
-[2025-03-15 21:30:39] Saved 9 packages for country TN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tn.json
+[2025-03-16 11:14:08] Saved 9 packages for country TN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tn.json
 Saved 9 packages for country TN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tn.json
-[2025-03-15 21:30:39] Saved 11 packages for country PK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pk.json
-Saved 11 packages for country PK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pk.json
-[2025-03-15 21:30:39] Saved 17 packages for country JO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jo.json
-Saved 17 packages for country JO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jo.json
-[2025-03-15 21:30:39] Saved 18 packages for country KW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kw.json
-Saved 18 packages for country KW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kw.json
-[2025-03-15 21:30:39] Saved 8 packages for country GE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ge.json
-Saved 8 packages for country GE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ge.json
-[2025-03-15 21:30:39] Saved 7 packages for country BY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/by.json
-Saved 7 packages for country BY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/by.json
-[2025-03-15 21:30:39] Saved 10 packages for country RU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ru.json
-Saved 10 packages for country RU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ru.json
-[2025-03-15 21:30:39] Saved 12 packages for country CA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ca.json
+[2025-03-16 11:14:08] Saved 3 packages for country PK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pk.json
+Saved 3 packages for country PK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pk.json
+[2025-03-16 11:14:08] Saved 16 packages for country JO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jo.json
+Saved 16 packages for country JO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jo.json
+[2025-03-16 11:14:08] Saved 17 packages for country KW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kw.json
+Saved 17 packages for country KW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kw.json
+[2025-03-16 11:14:08] Saved 3 packages for country GE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ge.json
+Saved 3 packages for country GE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ge.json
+[2025-03-16 11:14:08] Saved 3 packages for country BY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/by.json
+Saved 3 packages for country BY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/by.json
+[2025-03-16 11:14:08] Saved 6 packages for country RU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ru.json
+Saved 6 packages for country RU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ru.json
+[2025-03-16 11:14:08] Saved 12 packages for country CA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ca.json
 Saved 12 packages for country CA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ca.json
-[2025-03-15 21:30:39] Saved 25 packages for country MA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ma.json
+[2025-03-16 11:14:08] Saved 25 packages for country MA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ma.json
 Saved 25 packages for country MA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ma.json
-[2025-03-15 21:30:39] Saved 7 packages for country AZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/az.json
-Saved 7 packages for country AZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/az.json
-[2025-03-15 21:30:39] Saved 7 packages for country BH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bh.json
-Saved 7 packages for country BH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bh.json
-[2025-03-15 21:30:39] Saved 30 packages for country AE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ae.json
+[2025-03-16 11:14:08] Saved 3 packages for country AZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/az.json
+Saved 3 packages for country AZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/az.json
+[2025-03-16 11:14:08] Saved 6 packages for country BH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bh.json
+Saved 6 packages for country BH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bh.json
+[2025-03-16 11:14:08] Saved 30 packages for country AE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ae.json
 Saved 30 packages for country AE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ae.json
-[2025-03-15 21:30:39] Saved 11 packages for country KH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kh.json
-Saved 11 packages for country KH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kh.json
-[2025-03-15 21:30:39] Saved 7 packages for country BA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ba.json
-Saved 7 packages for country BA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ba.json
-[2025-03-15 21:30:39] Saved 7 packages for country XK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/xk.json
-Saved 7 packages for country XK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/xk.json
-[2025-03-15 21:30:39] Saved 7 packages for country MK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mk.json
-Saved 7 packages for country MK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mk.json
-[2025-03-15 21:30:39] Saved 7 packages for country RS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/rs.json
-Saved 7 packages for country RS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/rs.json
-[2025-03-15 21:30:39] Saved 24 packages for country EG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/eg.json
+[2025-03-16 11:14:08] Saved 6 packages for country KH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kh.json
+Saved 6 packages for country KH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kh.json
+[2025-03-16 11:14:08] Saved 3 packages for country BA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ba.json
+Saved 3 packages for country BA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ba.json
+[2025-03-16 11:14:08] Saved 3 packages for country XK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/xk.json
+Saved 3 packages for country XK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/xk.json
+[2025-03-16 11:14:08] Saved 3 packages for country MK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mk.json
+Saved 3 packages for country MK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mk.json
+[2025-03-16 11:14:08] Saved 3 packages for country RS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/rs.json
+Saved 3 packages for country RS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/rs.json
+[2025-03-16 11:14:08] Saved 24 packages for country EG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/eg.json
 Saved 24 packages for country EG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/eg.json
-[2025-03-15 21:30:39] Saved 8 packages for country BD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bd.json
-Saved 8 packages for country BD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bd.json
-[2025-03-15 21:30:39] Saved 4 packages for country FO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fo.json
-Saved 4 packages for country FO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/fo.json
-[2025-03-15 21:30:39] Saved 4 packages for country GG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gg.json
-Saved 4 packages for country GG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gg.json
-[2025-03-15 21:30:39] Saved 4 packages for country IM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/im.json
-Saved 4 packages for country IM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/im.json
-[2025-03-15 21:30:39] Saved 15 packages for country LK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lk.json
-Saved 15 packages for country LK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lk.json
-[2025-03-15 21:30:39] Saved 6 packages for country IN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/in.json
-Saved 6 packages for country IN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/in.json
-[2025-03-15 21:30:39] Saved 17 packages for country OM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/om.json
-Saved 17 packages for country OM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/om.json
-[2025-03-15 21:30:39] Saved 7 packages for country QA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/qa.json
-Saved 7 packages for country QA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/qa.json
-[2025-03-15 21:30:39] Saved 8 packages for country SA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sa.json
+[2025-03-16 11:14:08] Saved 5 packages for country IN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/in.json
+Saved 5 packages for country IN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/in.json
+[2025-03-16 11:14:08] Saved 16 packages for country OM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/om.json
+Saved 16 packages for country OM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/om.json
+[2025-03-16 11:14:08] Saved 6 packages for country QA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/qa.json
+Saved 6 packages for country QA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/qa.json
+[2025-03-16 11:14:08] Saved 8 packages for country SA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sa.json
 Saved 8 packages for country SA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sa.json
-[2025-03-15 21:30:39] Saved 5 packages for country ZA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/za.json
+[2025-03-16 11:14:08] Saved 5 packages for country ZA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/za.json
 Saved 5 packages for country ZA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/za.json
-[2025-03-15 21:30:39] Saved 6 packages for country GF to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gf.json
+[2025-03-16 11:14:08] Saved 6 packages for country GF to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gf.json
 Saved 6 packages for country GF to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gf.json
-[2025-03-15 21:30:39] Saved 3 packages for country GP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gp.json
+[2025-03-16 11:14:08] Saved 3 packages for country GP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gp.json
 Saved 3 packages for country GP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gp.json
-[2025-03-15 21:30:39] Saved 1 packages for country MQ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mq.json
+[2025-03-16 11:14:08] Saved 1 packages for country MQ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mq.json
 Saved 1 packages for country MQ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mq.json
-[2025-03-15 21:30:39] Saved 1 packages for country BL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bl.json
+[2025-03-16 11:14:08] Saved 1 packages for country BL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bl.json
 Saved 1 packages for country BL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bl.json
-[2025-03-15 21:30:39] Saved 1 packages for country MF to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mf.json
+[2025-03-16 11:14:08] Saved 1 packages for country MF to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mf.json
 Saved 1 packages for country MF to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mf.json
-[2025-03-15 21:30:39] Saved 5 packages for country GU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gu.json
-Saved 5 packages for country GU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gu.json
-[2025-03-15 21:30:39] Saved 5 packages for country LA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/la.json
-Saved 5 packages for country LA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/la.json
-[2025-03-15 21:30:39] Saved 7 packages for country AR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ar.json
+[2025-03-16 11:14:08] Saved 4 packages for country BD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bd.json
+Saved 4 packages for country BD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bd.json
+[2025-03-16 11:14:08] Saved 4 packages for country GU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gu.json
+Saved 4 packages for country GU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gu.json
+[2025-03-16 11:14:08] Saved 4 packages for country LA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/la.json
+Saved 4 packages for country LA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/la.json
+[2025-03-16 11:14:08] Saved 7 packages for country LK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lk.json
+Saved 7 packages for country LK to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lk.json
+[2025-03-16 11:14:08] Saved 7 packages for country AR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ar.json
 Saved 7 packages for country AR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ar.json
-[2025-03-15 21:30:39] Saved 7 packages for country CL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cl.json
+[2025-03-16 11:14:08] Saved 7 packages for country CL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cl.json
 Saved 7 packages for country CL to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cl.json
-[2025-03-15 21:30:39] Saved 6 packages for country PE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pe.json
+[2025-03-16 11:14:08] Saved 6 packages for country PE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pe.json
 Saved 6 packages for country PE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pe.json
-[2025-03-15 21:30:39] Saved 4 packages for country NG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ng.json
+[2025-03-16 11:14:08] Saved 4 packages for country NG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ng.json
 Saved 4 packages for country NG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ng.json
-[2025-03-15 21:30:39] Saved 2 packages for country RW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/rw.json
+[2025-03-16 11:14:08] Saved 2 packages for country RW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/rw.json
 Saved 2 packages for country RW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/rw.json
-[2025-03-15 21:30:39] Saved 6 packages for country DZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dz.json
+[2025-03-16 11:14:08] Saved 6 packages for country DZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dz.json
 Saved 6 packages for country DZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dz.json
-[2025-03-15 21:30:39] Saved 8 packages for country CR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cr.json
+[2025-03-16 11:14:08] Saved 8 packages for country CR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cr.json
 Saved 8 packages for country CR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cr.json
-[2025-03-15 21:30:39] Saved 6 packages for country EC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ec.json
+[2025-03-16 11:14:08] Saved 6 packages for country EC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ec.json
 Saved 6 packages for country EC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ec.json
-[2025-03-15 21:30:39] Saved 4 packages for country UY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/uy.json
+[2025-03-16 11:14:08] Saved 4 packages for country UY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/uy.json
 Saved 4 packages for country UY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/uy.json
-[2025-03-15 21:30:39] Saved 1 packages for country PY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/py.json
+[2025-03-16 11:14:08] Saved 1 packages for country PY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/py.json
 Saved 1 packages for country PY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/py.json
-[2025-03-15 21:30:39] Saved 5 packages for country CO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/co.json
+[2025-03-16 11:14:08] Saved 5 packages for country CO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/co.json
 Saved 5 packages for country CO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/co.json
-[2025-03-15 21:30:39] Saved 4 packages for country CG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cg.json
+[2025-03-16 11:14:08] Saved 4 packages for country CG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cg.json
 Saved 4 packages for country CG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cg.json
-[2025-03-15 21:30:39] Saved 2 packages for country BJ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bj.json
+[2025-03-16 11:14:08] Saved 2 packages for country BJ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bj.json
 Saved 2 packages for country BJ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bj.json
-[2025-03-15 21:30:39] Saved 2 packages for country CM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cm.json
+[2025-03-16 11:14:08] Saved 2 packages for country CM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cm.json
 Saved 2 packages for country CM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cm.json
-[2025-03-15 21:30:39] Saved 2 packages for country RE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/re.json
+[2025-03-16 11:14:08] Saved 2 packages for country RE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/re.json
 Saved 2 packages for country RE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/re.json
-[2025-03-15 21:30:39] Saved 4 packages for country PR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pr.json
+[2025-03-16 11:14:08] Saved 4 packages for country PR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pr.json
 Saved 4 packages for country PR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pr.json
-[2025-03-15 21:30:39] Saved 2 packages for country MU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mu.json
+[2025-03-16 11:14:08] Saved 2 packages for country MU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mu.json
 Saved 2 packages for country MU to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mu.json
-[2025-03-15 21:30:39] Saved 2 packages for country CV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cv.json
+[2025-03-16 11:14:08] Saved 2 packages for country CV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cv.json
 Saved 2 packages for country CV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cv.json
-[2025-03-15 21:30:39] Saved 2 packages for country TD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/td.json
+[2025-03-16 11:14:08] Saved 2 packages for country TD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/td.json
 Saved 2 packages for country TD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/td.json
-[2025-03-15 21:30:39] Saved 2 packages for country CD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cd.json
+[2025-03-16 11:14:08] Saved 2 packages for country CD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cd.json
 Saved 2 packages for country CD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cd.json
-[2025-03-15 21:30:39] Saved 2 packages for country KE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ke.json
+[2025-03-16 11:14:08] Saved 2 packages for country KE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ke.json
 Saved 2 packages for country KE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ke.json
-[2025-03-15 21:30:39] Saved 3 packages for country MG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mg.json
+[2025-03-16 11:14:08] Saved 3 packages for country MG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mg.json
 Saved 3 packages for country MG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mg.json
-[2025-03-15 21:30:39] Saved 2 packages for country MW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mw.json
+[2025-03-16 11:14:08] Saved 2 packages for country MW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mw.json
 Saved 2 packages for country MW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mw.json
-[2025-03-15 21:30:39] Saved 2 packages for country NE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ne.json
+[2025-03-16 11:14:08] Saved 2 packages for country NE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ne.json
 Saved 2 packages for country NE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ne.json
-[2025-03-15 21:30:39] Saved 2 packages for country TZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tz.json
+[2025-03-16 11:14:08] Saved 2 packages for country TZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tz.json
 Saved 2 packages for country TZ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tz.json
-[2025-03-15 21:30:39] Saved 3 packages for country UG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ug.json
+[2025-03-16 11:14:08] Saved 3 packages for country UG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ug.json
 Saved 3 packages for country UG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ug.json
-[2025-03-15 21:30:39] Saved 1 packages for country BW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bw.json
+[2025-03-16 11:14:08] Saved 1 packages for country BW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bw.json
 Saved 1 packages for country BW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bw.json
-[2025-03-15 21:30:39] Saved 1 packages for country GH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gh.json
+[2025-03-16 11:14:08] Saved 1 packages for country GH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gh.json
 Saved 1 packages for country GH to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gh.json
-[2025-03-15 21:30:39] Saved 1 packages for country ML to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ml.json
+[2025-03-16 11:14:08] Saved 1 packages for country ML to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ml.json
 Saved 1 packages for country ML to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ml.json
-[2025-03-15 21:30:39] Saved 1 packages for country YT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/yt.json
+[2025-03-16 11:14:08] Saved 1 packages for country YT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/yt.json
 Saved 1 packages for country YT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/yt.json
-[2025-03-15 21:30:39] Saved 1 packages for country SN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sn.json
+[2025-03-16 11:14:08] Saved 1 packages for country SN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sn.json
 Saved 1 packages for country SN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sn.json
-[2025-03-15 21:30:39] Saved 4 packages for country PA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pa.json
+[2025-03-16 11:14:08] Saved 4 packages for country PA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pa.json
 Saved 4 packages for country PA to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/pa.json
-[2025-03-15 21:30:39] Saved 6 packages for country JM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jm.json
+[2025-03-16 11:14:08] Saved 6 packages for country JM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jm.json
 Saved 6 packages for country JM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/jm.json
-[2025-03-15 21:30:39] Saved 4 packages for country AI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ai.json
+[2025-03-16 11:14:08] Saved 4 packages for country AI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ai.json
 Saved 4 packages for country AI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ai.json
-[2025-03-15 21:30:39] Saved 4 packages for country AG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ag.json
+[2025-03-16 11:14:08] Saved 4 packages for country AG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ag.json
 Saved 4 packages for country AG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ag.json
-[2025-03-15 21:30:39] Saved 2 packages for country AW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/aw.json
+[2025-03-16 11:14:08] Saved 2 packages for country AW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/aw.json
 Saved 2 packages for country AW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/aw.json
-[2025-03-15 21:30:39] Saved 4 packages for country BS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bs.json
+[2025-03-16 11:14:08] Saved 4 packages for country BS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bs.json
 Saved 4 packages for country BS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bs.json
-[2025-03-15 21:30:39] Saved 4 packages for country BB to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bb.json
+[2025-03-16 11:14:08] Saved 4 packages for country BB to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bb.json
 Saved 4 packages for country BB to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bb.json
-[2025-03-15 21:30:39] Saved 2 packages for country BM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bm.json
+[2025-03-16 11:14:08] Saved 2 packages for country BM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bm.json
 Saved 2 packages for country BM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bm.json
-[2025-03-15 21:30:39] Saved 4 packages for country BQ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bq.json
+[2025-03-16 11:14:08] Saved 4 packages for country BQ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bq.json
 Saved 4 packages for country BQ to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bq.json
-[2025-03-15 21:30:39] Saved 4 packages for country VG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vg.json
+[2025-03-16 11:14:08] Saved 4 packages for country VG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vg.json
 Saved 4 packages for country VG to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vg.json
-[2025-03-15 21:30:39] Saved 4 packages for country KY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ky.json
+[2025-03-16 11:14:08] Saved 4 packages for country KY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ky.json
 Saved 4 packages for country KY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ky.json
-[2025-03-15 21:30:39] Saved 2 packages for country CW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cw.json
+[2025-03-16 11:14:08] Saved 2 packages for country CW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cw.json
 Saved 2 packages for country CW to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/cw.json
-[2025-03-15 21:30:39] Saved 4 packages for country DM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dm.json
+[2025-03-16 11:14:08] Saved 4 packages for country DM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dm.json
 Saved 4 packages for country DM to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/dm.json
-[2025-03-15 21:30:39] Saved 4 packages for country GD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gd.json
+[2025-03-16 11:14:08] Saved 4 packages for country GD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gd.json
 Saved 4 packages for country GD to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gd.json
-[2025-03-15 21:30:39] Saved 2 packages for country GY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gy.json
+[2025-03-16 11:14:08] Saved 2 packages for country GY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gy.json
 Saved 2 packages for country GY to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gy.json
-[2025-03-15 21:30:39] Saved 2 packages for country HT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ht.json
+[2025-03-16 11:14:08] Saved 2 packages for country HT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ht.json
 Saved 2 packages for country HT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ht.json
-[2025-03-15 21:30:39] Saved 4 packages for country MS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ms.json
+[2025-03-16 11:14:08] Saved 4 packages for country MS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ms.json
 Saved 4 packages for country MS to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ms.json
-[2025-03-15 21:30:39] Saved 4 packages for country KN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kn.json
+[2025-03-16 11:14:08] Saved 4 packages for country KN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kn.json
 Saved 4 packages for country KN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/kn.json
-[2025-03-15 21:30:39] Saved 4 packages for country LC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lc.json
+[2025-03-16 11:14:08] Saved 4 packages for country LC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lc.json
 Saved 4 packages for country LC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/lc.json
-[2025-03-15 21:30:39] Saved 4 packages for country VC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vc.json
+[2025-03-16 11:14:08] Saved 4 packages for country VC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vc.json
 Saved 4 packages for country VC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/vc.json
-[2025-03-15 21:30:39] Saved 4 packages for country TC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tc.json
+[2025-03-16 11:14:08] Saved 4 packages for country TC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tc.json
 Saved 4 packages for country TC to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/tc.json
-[2025-03-15 21:30:39] Saved 1 packages for country VE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ve.json
+[2025-03-16 11:14:08] Saved 1 packages for country VE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ve.json
 Saved 1 packages for country VE to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ve.json
-[2025-03-15 21:30:39] Saved 1 packages for country IR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ir.json
+[2025-03-16 11:14:08] Saved 1 packages for country IR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ir.json
 Saved 1 packages for country IR to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ir.json
-[2025-03-15 21:30:39] Saved 2 packages for country DO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/do.json
+[2025-03-16 11:14:08] Saved 2 packages for country DO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/do.json
 Saved 2 packages for country DO to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/do.json
-[2025-03-15 21:30:39] Saved 2 packages for country SV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sv.json
+[2025-03-16 11:14:08] Saved 2 packages for country SV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sv.json
 Saved 2 packages for country SV to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sv.json
-[2025-03-15 21:30:39] Saved 2 packages for country GT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gt.json
+[2025-03-16 11:14:08] Saved 2 packages for country GT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gt.json
 Saved 2 packages for country GT to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/gt.json
-[2025-03-15 21:30:39] Saved 2 packages for country HN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hn.json
+[2025-03-16 11:14:08] Saved 2 packages for country HN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hn.json
 Saved 2 packages for country HN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/hn.json
-[2025-03-15 21:30:39] Saved 2 packages for country NI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ni.json
+[2025-03-16 11:14:08] Saved 2 packages for country NI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ni.json
 Saved 2 packages for country NI to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/ni.json
-[2025-03-15 21:30:39] Saved 2 packages for country SX to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sx.json
+[2025-03-16 11:14:08] Saved 2 packages for country SX to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sx.json
 Saved 2 packages for country SX to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/sx.json
-[2025-03-15 21:30:39] Saved 1 packages for country BN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bn.json
-Saved 1 packages for country BN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/bn.json
-[2025-03-15 21:30:39] Saved 1 packages for country MN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mn.json
-Saved 1 packages for country MN to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/mn.json
-[2025-03-15 21:30:39] Saved 1 packages for country NP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/np.json
-Saved 1 packages for country NP to /var/www/html/wp-content/plugins/AdPro-esim/cron/../data/np.json
-[2025-03-15 21:30:39] Successfully saved packages for 162 countries
-Successfully saved packages for 162 countries
-[2025-03-15 21:30:39] Saved list of 162 countries with packages
-Saved list of 162 countries with packages
-[2025-03-15 21:30:39] eSIM packages update completed
+[2025-03-16 11:14:08] Successfully saved packages for 153 countries
+Successfully saved packages for 153 countries
+[2025-03-16 11:14:08] Saved list of 153 countries with packages
+Saved list of 153 countries with packages
+[2025-03-16 11:14:08] eSIM packages update completed
 eSIM packages update completed

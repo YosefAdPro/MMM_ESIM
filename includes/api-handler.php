@@ -7,6 +7,77 @@ if (!defined('ABSPATH')) {
     exit; // יציאה אם הגישה ישירה
 }
 
+
+/**
+ * פונקציה לסינון חבילות כפולות ולהשאיר רק את הזולות ביותר
+ * 
+ * @param array $packages מערך של חבילות
+ * @return array מערך מסונן של חבילות
+ */
+function AdPro_filter_duplicate_packages($packages) {
+    if (empty($packages) || !is_array($packages)) {
+        return $packages;
+    }
+    
+    // יצירת מערך לאחסון חבילות ייחודיות
+    $unique_packages = [];
+    
+    // מערך עזר לבדיקת חבילות דומות
+    $package_fingerprints = [];
+    
+    foreach ($packages as $package) {
+        // בדיקת תקינות המידע
+        if (!isset($package['productDetails']) || !is_array($package['productDetails']) || 
+            !isset($package['retailPrice']) || !isset($package['countries'])) {
+            continue;
+        }
+        
+        // חילוץ פרטי החבילה
+        $data_limit = '';
+        $data_unit = '';
+        $validity_days = '';
+        
+        foreach ($package['productDetails'] as $detail) {
+            if ($detail['name'] === 'PLAN_DATA_LIMIT' && !empty($detail['value'])) {
+                $data_limit = $detail['value'];
+            }
+            if ($detail['name'] === 'PLAN_DATA_UNIT' && !empty($detail['value'])) {
+                $data_unit = $detail['value'];
+            }
+            if ($detail['name'] === 'PLAN_VALIDITY' && !empty($detail['value'])) {
+                $validity_days = round(intval($detail['value']) / 24);
+            }
+        }
+        
+        // יצירת טביעת אצבע ייחודית לחבילה
+        // שילוב של נפח הנתונים, יחידת הנתונים, תקופת התוקף ומדינות נתמכות
+        $countries = isset($package['countries']) ? $package['countries'] : [];
+        sort($countries); // מיון כדי שסדר המדינות לא ישפיע
+        $countries_hash = md5(json_encode($countries));
+        
+        $fingerprint = "{$data_limit}_{$data_unit}_{$validity_days}_{$countries_hash}";
+        
+        // בדיקה אם ראינו כבר חבילה דומה
+        if (isset($package_fingerprints[$fingerprint])) {
+            // השוואת מחירים
+            $existing_package = $unique_packages[$package_fingerprints[$fingerprint]];
+            
+            // אם החבילה הנוכחית זולה יותר, החלף את הקיימת
+            if (floatval($package['retailPrice']) < floatval($existing_package['retailPrice'])) {
+                $unique_packages[$package_fingerprints[$fingerprint]] = $package;
+            }
+        } else {
+            // זו חבילה חדשה - הוסף אותה למערך
+            $index = count($unique_packages);
+            $unique_packages[] = $package;
+            $package_fingerprints[$fingerprint] = $index;
+        }
+    }
+    
+    // החזר מערך של חבילות ייחודיות
+    return array_values($unique_packages);
+}
+
 /**
  * קבלת חבילות eSIM לפי מדינה
  * 
@@ -26,7 +97,8 @@ function AdPro_esim_get_packages($country = '') {
             if ($packages !== null) {
                 // סינון חבילות עם מגבלת מהירות
                 $packages = AdPro_filter_speed_restricted_packages($packages);
-                
+                // סינון חבילות כפולות - השאר רק את הזולות ביותר
+				$packages = AdPro_filter_duplicate_packages($packages);			
                 // סינון ספקים מוסתרים
                 $hidden_providers = get_option('AdPro_hidden_providers', []);
                 if (!empty($hidden_providers)) {
@@ -64,7 +136,8 @@ function AdPro_esim_get_packages($country = '') {
             if (!empty($all_packages)) {
                 // סינון חבילות עם מגבלת מהירות
                 $all_packages = AdPro_filter_speed_restricted_packages($all_packages);
-                
+                // סינון חבילות כפולות - השאר רק את הזולות ביותר
+				$all_packages = AdPro_filter_duplicate_packages($all_packages);
                 // סינון ספקים מוסתרים
                 $hidden_providers = get_option('AdPro_hidden_providers', []);
                 if (!empty($hidden_providers)) {
@@ -153,6 +226,9 @@ function AdPro_esim_get_packages($country = '') {
     
     // סינון חבילות עם מגבלת מהירות
     $packages = AdPro_filter_speed_restricted_packages($packages);
+	
+	    // סינון חבילות כפולות - השאר רק את הזולות ביותר
+    $packages = AdPro_filter_duplicate_packages($packages);
     
     // סינון ספקים שסומנו להסתרה
     $hidden_providers = get_option('AdPro_hidden_providers', []);

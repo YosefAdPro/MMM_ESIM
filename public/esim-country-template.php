@@ -214,7 +214,36 @@ if ($country_data) {
                         }
                         ?>
                         
-                        <h2><?php echo esc_html($package_title); ?></h2>
+                        <?php
+// יצירת כותרת מותאמת אישית
+$custom_title = '';
+$countries_count = isset($package['countries']) ? count($package['countries']) : 0;
+
+// הוספת שם המדינה
+if (!empty($hebrew_country)) {
+    $custom_title .= "חבילת גלישה ל" . esc_html($hebrew_country);
+    
+    // הוספת מספר מדינות נוספות אם יש יותר ממדינה אחת
+    if ($countries_count > 1) {
+        $additional_countries = $countries_count - 1;
+        $custom_title .= " ועוד " . $additional_countries . " מדינות";
+    }
+} else {
+    // כותרת עם רק מספר מדינות אם אין מדינה ספציפית
+    $custom_title .= "חבילת גלישה ל-" . $countries_count . " מדינות";
+}
+
+// הוספת נפח הנתונים
+if (!empty($data_limit) && !empty($data_unit)) {
+    $custom_title .= " עם " . $data_limit . " " . $data_unit;
+}
+
+// הוספת תקופת התוקף
+if (!empty($validity_days)) {
+    $custom_title .= " למשך " . $validity_days . " ימים";
+}
+?>
+<h2><?php echo $custom_title; ?></h2>
                         
 <div class="package-details">
     <p class="price"><?php echo esc_html($price); ?> <?php echo esc_html($currency); ?></p>

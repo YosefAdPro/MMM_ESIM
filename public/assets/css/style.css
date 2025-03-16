@@ -320,14 +320,19 @@ select:focus {
 }
 
 .package h2 {
-    padding: 20px;
+    padding: 15px;
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    line-height: 1.4;
     background: linear-gradient(to left, #f8f9fa, #eaeaea);
     border-bottom: 1px solid #eee;
     text-align: center;
     font-weight: 600;
     color: var(--text-color);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .package-details {

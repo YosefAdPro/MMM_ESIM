@@ -710,9 +710,13 @@ function AdPro_esim_country_content_page() {
  * דף ניהול ספקים
  */
 function AdPro_esim_providers_page() {
-    // קבלת רשימת ספקים על ידי פניה ל-API ושליפת נתונים ייחודיים
+    // מערך לאחסון כל הספקים
     $providers = [];
     $hidden_providers = get_option('AdPro_hidden_providers', []);
+    
+    if (!is_array($hidden_providers)) {
+        $hidden_providers = array();
+    }
     
     // שמירת שינויים
     if (isset($_POST['save_providers']) && check_admin_referer('AdPro_providers_nonce')) {
@@ -721,17 +725,47 @@ function AdPro_esim_providers_page() {
         echo '<div class="notice notice-success"><p>הגדרות הספקים נשמרו בהצלחה!</p></div>';
     }
     
-    // קבלת נתוני ספקים מהשרת
+    // קבלת פרטי API
     $api_key = get_option('AdPro_api_key');
     $merchant_id = get_option('AdPro_merchant_id');
     
-    if (!empty($api_key) && !empty($merchant_id)) {
+    // איסוף הספקים מקבצי נתונים מקומיים או מה-API
+    $all_providers = [];
+    
+    // נסה לאסוף ספקים מהקבצים המקומיים
+    $data_dir = ADPRO_ESIM_PATH . 'data/';
+    $countries_list_file = $data_dir . 'countries_list.json';
+    
+    if (file_exists($countries_list_file)) {
+        $countries_list = json_decode(file_get_contents($countries_list_file), true);
+        
+        foreach ($countries_list as $iso) {
+            $country_file = $data_dir . strtolower($iso) . '.json';
+            
+            if (file_exists($country_file)) {
+                $packages = json_decode(file_get_contents($country_file), true);
+                if (is_array($packages)) {
+                    foreach ($packages as $package) {
+                        if (isset($package['providerId']) && isset($package['providerName'])) {
+                            $all_providers[$package['providerId']] = [
+                                'id' => $package['providerId'],
+                                'name' => $package['providerName'],
+                                'hidden' => in_array($package['providerId'], $hidden_providers)
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // אם לא מצאנו ספקים בקבצים המקומיים, ננסה לקבל מה-API
+    if (empty($all_providers) && !empty($api_key) && !empty($merchant_id)) {
         $packages = AdPro_esim_get_packages();
         
-        // חילוץ ספקים ייחודיים
         foreach ($packages as $package) {
             if (isset($package['providerId']) && isset($package['providerName'])) {
-                $providers[$package['providerId']] = [
+                $all_providers[$package['providerId']] = [
                     'id' => $package['providerId'],
                     'name' => $package['providerName'],
                     'hidden' => in_array($package['providerId'], $hidden_providers)
@@ -740,18 +774,23 @@ function AdPro_esim_providers_page() {
         }
     }
     
+    // מיון הספקים לפי שם
+    uasort($all_providers, function($a, $b) {
+        return strcmp($a['name'], $b['name']);
+    });
+    
     ?>
     <div class="wrap">
-        <h1>ניהול ספקים</h1>
-        <p>הסתר או הצג ספקים שונים באתר.</p>
+        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+        <p>הסתר או הצג ספקים שונים באתר. סמן את הספקים שברצונך להסתיר.</p>
         
         <?php if (empty($api_key) || empty($merchant_id)) : ?>
             <div class="notice notice-warning">
                 <p>חסרים פרטי התחברות ל-API. <a href="<?php echo admin_url('admin.php?page=AdPro-esim-settings'); ?>">הגדר את פרטי ה-API</a> כדי לראות רשימת ספקים.</p>
             </div>
-        <?php elseif (empty($providers)) : ?>
+        <?php elseif (empty($all_providers)) : ?>
             <div class="notice notice-warning">
-                <p>לא נמצאו ספקים. וודא שיש חיבור תקין ל-API.</p>
+                <p>לא נמצאו ספקים. וודא שיש חיבור תקין ל-API או שיש קבצי נתונים מקומיים.</p>
             </div>
         <?php else : ?>
             <form method="post" action="">
@@ -766,7 +805,7 @@ function AdPro_esim_providers_page() {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($providers as $provider) : ?>
+                        <?php foreach ($all_providers as $provider) : ?>
                             <tr>
                                 <td>
                                     <label class="switch">
