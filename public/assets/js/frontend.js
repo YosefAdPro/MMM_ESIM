@@ -1,443 +1,290 @@
-jQuery(document).ready(function($) {
-    console.log("Script loaded successfully"); // בדיקת טעינה
-    
-    // ==== Mobile Filter Toggle Functions ====
-    console.log("Filter-mobile-toggle elements:", $('.filter-mobile-toggle').length); // בדיקה
-    
-    // Toggle filters on mobile
-    $(document).on('click', '.filter-mobile-toggle', function() {
-        console.log("Filter toggle clicked"); // בדיקה
+jQuery(document).ready(function ($) {
+    console.log('Script loaded successfully');
+
+    // ניהול סינון במובייל
+    function toggleMobileFilters() {
         $('.package-filters').toggleClass('filters-open');
-        
-        // Change button text based on state
-        if ($('.package-filters').hasClass('filters-open')) {
-            $(this).text('סגור סינון');
-        } else {
-            $(this).text('פתח סינון מתקדם');
-        }
-    });
-    
-    // Close filter dropdown when clicking outside
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.package-filters').length && 
-            !$(e.target).is('.filter-mobile-toggle') && 
+        const buttonText = $('.package-filters').hasClass('filters-open') ? 'סגור סינון' : 'פתח סינון מתקדם';
+        $('.filter-mobile-toggle').text(buttonText);
+        $('.sticky-filter-button').text(buttonText);
+    }
+
+    function handleOutsideClick(e) {
+        if (
+            !$(e.target).closest('.package-filters').length &&
+            !$(e.target).is('.filter-mobile-toggle') &&
+            !$(e.target).is('.sticky-filter-button') &&
             $('.package-filters').hasClass('filters-open') &&
-            window.innerWidth <= 768) {
+            window.innerWidth <= 768
+        ) {
             $('.package-filters').removeClass('filters-open');
             $('.filter-mobile-toggle').text('פתח סינון מתקדם');
-        }
-    });
-    
-    // Check screen size and adjust filters visibility
-    function checkScreenSize() {
-        console.log("Checking screen size, width:", window.innerWidth); // בדיקה
-        if (window.innerWidth > 768) {
-            $('.filter-content').show();
-        } else if (!$('.package-filters').hasClass('filters-open')) {
-            $('.filter-content').hide();
+            $('.sticky-filter-button').text('פתח סינון מתקדם');
         }
     }
-    
-    // Run on page load
-    checkScreenSize();
-    
-    // Run on window resize
-    $(window).resize(function() {
-        checkScreenSize();
-    });
-    
-    // ==== Package Filtering Functions ====
-    
+
+    function adjustFilterVisibility() {
+        if (window.innerWidth > 768) {
+            $('.filter-content').show();
+        } else {
+            $('.filter-content').toggle($('.package-filters').hasClass('filters-open'));
+        }
+    }
+
+    // רישום אירועים לסינון במובייל
+    $(document).on('click', '.filter-mobile-toggle', toggleMobileFilters);
+    $(document).on('click', handleOutsideClick);
+    $(window).on('resize', adjustFilterVisibility);
+    adjustFilterVisibility();
+
+    // סינון ומיון חבילות
     if ($('.packages-list').length) {
-        function filterPackages() {
-            var dataFilter = $('#data-filter').val();
-            var durationFilter = $('#duration-filter').val();
-            var priceFilter = $('#price-filter').val();
-            
-            // עבור על כל החבילות
-            $('.package').each(function() {
-                var $package = $(this);
-                var dataText = $package.find('.data').text();
-                var durationText = $package.find('.validity').text();
-                
-                // חלץ את כמות הנתונים (GB)
-                var dataMatch = dataText.match(/(\d+(\.\d+)?)\s*GB/i);
-                var dataAmount = dataMatch ? parseFloat(dataMatch[1]) : 0;
-                
-                // חלץ את משך הזמן (ימים)
-                var durationMatch = durationText.match(/(\d+)\s*ימים/i);
-                var durationDays = durationMatch ? parseInt(durationMatch[1]) : 0;
-                
-                var showByData = dataFilter === 'all';
-                var showByDuration = durationFilter === 'all';
-                
-                // בדיקת סינון לפי נתונים
-                if (!showByData) {
-                    if (dataFilter === '1-5' && dataAmount >= 1 && dataAmount <= 5) showByData = true;
-                    else if (dataFilter === '5-10' && dataAmount > 5 && dataAmount <= 10) showByData = true;
-                    else if (dataFilter === '10-20' && dataAmount > 10 && dataAmount <= 20) showByData = true;
-                    else if (dataFilter === '20-50' && dataAmount > 20 && dataAmount <= 50) showByData = true;
-                    else if (dataFilter === '50+' && dataAmount > 50) showByData = true;
-                }
-                
-                // בדיקת סינון לפי זמן
-                if (!showByDuration) {
-                    if (durationFilter === '1-7' && durationDays >= 1 && durationDays <= 7) showByDuration = true;
-                    else if (durationFilter === '7-14' && durationDays > 7 && durationDays <= 14) showByDuration = true;
-                    else if (durationFilter === '14-30' && durationDays > 14 && durationDays <= 30) showByDuration = true;
-                    else if (durationFilter === '30-90' && durationDays > 30 && durationDays <= 90) showByDuration = true;
-                    else if (durationFilter === '90+' && durationDays > 90) showByDuration = true;
-                }
-                
-                // הצג או הסתר את החבילה
-                if (showByData && showByDuration) {
-                    $package.removeClass('hidden-package');
-                } else {
-                    $package.addClass('hidden-package');
-                }
-            });
-            
-            // בדוק אם אין חבילות מוצגות לאחר סינון
-            if ($('.package:not(.hidden-package)').length === 0) {
-                if ($('.no-filtered-packages').length === 0) {
-                    $('.packages-list').append('<div class="no-filtered-packages"><p>לא נמצאו חבילות העונות לקריטריוני הסינון.</p></div>');
-                }
-            } else {
-                $('.no-filtered-packages').remove();
-            }
-        }
+function filterPackages() {
+    const dataFilter = $('#data-filter').val();
+    const durationFilter = $('#duration-filter').val();
+
+    $('.package').each(function () {
+        const $package = $(this);
         
-        // פונקציה למיון לפי מחיר
+        // חיפוש נתונים במבנה החדש - מחפש את הטקסט בתוך info-value
+        let dataAmount = 0;
+        let durationDays = 0;
+        
+        // חיפוש נתוני GB ותוקף
+        $package.find('.info-item').each(function() {
+            const label = $(this).find('.info-label').text().trim();
+            const value = $(this).find('.info-value').text().trim();
+            
+            if (label.includes('נתונים')) {
+                dataAmount = parseFloat(value.match(/(\d+(\.\d+)?)/i) || 0);
+            }
+            
+            if (label.includes('תוקף')) {
+                durationDays = parseInt(value.match(/(\d+)/i) || 0);
+            }
+        });
+
+        const showByData =
+            dataFilter === 'all' ||
+            (dataFilter === '1-5' && dataAmount >= 1 && dataAmount <= 5) ||
+            (dataFilter === '5-10' && dataAmount > 5 && dataAmount <= 10) ||
+            (dataFilter === '10-20' && dataAmount > 10 && dataAmount <= 20) ||
+            (dataFilter === '20-50' && dataAmount > 20 && dataAmount <= 50) ||
+            (dataFilter === '50+' && dataAmount > 50);
+
+        const showByDuration =
+            durationFilter === 'all' ||
+            (durationFilter === '1-7' && durationDays >= 1 && durationDays <= 7) ||
+            (durationFilter === '7-14' && durationDays > 7 && durationDays <= 14) ||
+            (durationFilter === '14-30' && durationDays > 14 && durationDays <= 30) ||
+            (durationFilter === '30-90' && durationDays > 30 && durationDays <= 90) ||
+            (durationFilter === '90+' && durationDays > 90);
+
+        $package.toggleClass('hidden-package', !(showByData && showByDuration));
+    });
+
+    $('.no-filtered-packages').remove();
+    if ($('.package:not(.hidden-package)').length === 0) {
+        $('.packages-list').append(
+            '<div class="no-filtered-packages"><p>לא נמצאו חבילות העונות לקריטריוני הסינון.</p></div>'
+        );
+    }
+}
+
         function sortPackagesByPrice() {
-            var sortDirection = $('#price-filter').val();
-            
-            if (sortDirection === 'all') {
-                return; // אין צורך במיון
-            }
-            
-            var $packagesContainer = $('.packages-list');
-            var $packages = $packagesContainer.children('.package').get();
-            
-            $packages.sort(function(a, b) {
-                var priceA = parseFloat($(a).find('.price').text().replace(/[^\d.]/g, ''));
-                var priceB = parseFloat($(b).find('.price').text().replace(/[^\d.]/g, ''));
-                
-                if (isNaN(priceA)) priceA = 0;
-                if (isNaN(priceB)) priceB = 0;
-                
-                if (sortDirection === 'low-to-high') {
-                    return priceA - priceB;
-                } else {
-                    return priceB - priceA;
-                }
+            const sortDirection = $('#price-filter').val();
+            if (sortDirection === 'all') return;
+
+            const $packagesContainer = $('.packages-list');
+            const $packages = $packagesContainer.children('.package').get();
+
+            $packages.sort(function (a, b) {
+                const priceA = parseFloat($(a).find('.price').text().replace(/[^\d.]/g, '')) || 0;
+                const priceB = parseFloat($(b).find('.price').text().replace(/[^\d.]/g, '')) || 0;
+                return sortDirection === 'low-to-high' ? priceA - priceB : priceB - priceA;
             });
-            
-            // החלף את הסדר בדף
-            $.each($packages, function(i, item) {
-                $packagesContainer.append(item);
-            });
+
+            $packagesContainer.empty().append($packages);
         }
-        
-        // אירועי שינוי בסינון
+
         $('#data-filter, #duration-filter').on('change', filterPackages);
-        
-        // אירוע שינוי במיון לפי מחיר
         $('#price-filter').on('change', sortPackagesByPrice);
-        
-        // איפוס סינון
-        $('#reset-filters').on('click', function() {
-            $('#data-filter, #duration-filter').val('all');
-            $('#price-filter').val('all');
+        $('#reset-filters').on('click', function () {
+            $('#data-filter, #duration-filter, #price-filter').val('all');
             $('.package').removeClass('hidden-package');
             $('.no-filtered-packages').remove();
         });
     }
-    
-    // ==== Country Search Functions ====
-    
-    var countries = AdPro_esim_ajax.countries;
-    var $searchInput = $('#country-search');
-    var $suggestionsContainer = $('#country-suggestions');
-    
-    $searchInput.on('input', function() {
-        var input = $(this).val().trim().toLowerCase(); // התעלמות מרגישות לאותיות
-        
-        if (input.length === 0) {
+
+    // חיפוש מדינות
+    const countries = AdPro_esim_ajax?.countries || {};
+    const $searchInput = $('#country-search');
+    const $suggestionsContainer = $('#country-suggestions');
+
+    $searchInput.on('input', function () {
+        const input = $(this).val().trim().toLowerCase();
+        if (!input) {
             $suggestionsContainer.empty().hide();
             return;
         }
-        
-        var matches = [];
-        Object.keys(countries).forEach(function(hebrew) {
-            if (hebrew.toLowerCase().indexOf(input) !== -1) {
-                matches.push({
-                    hebrew: hebrew,
-                    iso: countries[hebrew].iso,
-                    slug: countries[hebrew].slug
-                });
-            }
-        });
-        
-        matches.sort(function(a, b) {
-            var aStartsWith = a.hebrew.toLowerCase().indexOf(input) === 0;
-            var bStartsWith = b.hebrew.toLowerCase().indexOf(input) === 0;
-            
-            if (aStartsWith && !bStartsWith) return -1;
-            if (!aStartsWith && bStartsWith) return 1;
-            return a.hebrew.localeCompare(b.hebrew);
-        });
-        
-        if (matches.length > 0) {
-            var html = '';
-            matches.forEach(function(match) {
-                html += '<div class="suggestion" data-country="' + match.slug + '">' +
-                    '<img src="https://flagcdn.com/16x12/' + match.iso.toLowerCase() + '.png" alt="' + match.hebrew + '"> ' +
-                    '<span>' + match.hebrew + '</span></div>';
+
+        const matches = Object.keys(countries)
+            .filter((hebrew) => hebrew.toLowerCase().includes(input))
+            .map((hebrew) => ({
+                hebrew,
+                iso: countries[hebrew].iso,
+                slug: countries[hebrew].slug,
+            }))
+            .sort((a, b) => a.hebrew.localeCompare(b.hebrew));
+
+        $suggestionsContainer.empty();
+        if (matches.length) {
+            matches.forEach((match) => {
+                $suggestionsContainer.append(
+                    `<div class="suggestion" data-country="${match.slug}">
+                        <img src="https://flagcdn.com/16x12/${match.iso.toLowerCase()}.png" alt="${match.hebrew}">
+                        <span>${match.hebrew}</span>
+                    </div>`
+                );
             });
-            $suggestionsContainer.html(html).show();
         } else {
-            $suggestionsContainer.html('<div class="no-results">לא נמצאו תוצאות</div>').show();
+            $suggestionsContainer.append('<div class="no-results">לא נמצאו תוצאות</div>');
         }
+        $suggestionsContainer.show();
     });
-    
-    // Click on suggestion
-    $(document).on('click', '.suggestion', function() {
-        var slug = $(this).data('country');
-        window.location.href = AdPro_esim_ajax.site_url + '/esim/' + slug;
+
+    $(document).on('click', '.suggestion', function () {
+        window.location.href = `${AdPro_esim_ajax.site_url}/esim/${$(this).data('country')}`;
     });
-    
-    // Hide suggestions when clicking outside
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.search-box').length) {
-            $suggestionsContainer.hide();
-        }
+
+    $(document).on('click', (e) => {
+        if (!$(e.target).closest('.search-box').length) $suggestionsContainer.hide();
     });
-    
-    // Keyboard navigation for suggestions
-    $searchInput.on('keydown', function(e) {
-        var $suggestions = $('.suggestion');
-        var $selected = $('.suggestion.selected');
-        var $current;
-        
+
+    $searchInput.on('keydown', function (e) {
+        const $suggestions = $('.suggestion');
+        const $selected = $('.suggestion.selected');
+        let $current;
+
         if (e.keyCode === 40) { // חץ למטה
-            if ($selected.length === 0 || $selected.is(':last-child')) {
-                $current = $suggestions.first();
-            } else {
-                $current = $selected.next();
-            }
-            $suggestions.removeClass('selected');
-            $current.addClass('selected');
-            // גלילה אוטומטית להצעה שנבחרה
-            if ($current.length) {
-                $current[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-            return false;
-        }
-        
-        if (e.keyCode === 38) { // חץ למעלה
-            if ($selected.length === 0 || $selected.is(':first-child')) {
-                $current = $suggestions.last();
-            } else {
-                $current = $selected.prev();
-            }
-            $suggestions.removeClass('selected');
-            $current.addClass('selected');
-            if ($current.length) {
-                $current[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-            return false;
-        }
-        
-        if (e.keyCode === 13 && $selected.length > 0) { // Enter
+            $current = $selected.length ? $selected.next() : $suggestions.first();
+        } else if (e.keyCode === 38) { // חץ למעלה
+            $current = $selected.length ? $selected.prev() : $suggestions.last();
+        } else if (e.keyCode === 13 && $selected.length) { // Enter
             e.preventDefault();
             $selected.click();
-        }
-    });
-    
-    // ==== Package Modal Functions ====
-    
-    // פתיחת המודאל של פרטי החבילה בלחיצה על החבילה
-    $(document).on('click', '.package-clickable', function(e) {
-        // מניעת הפעלה אם לחצו על הכפתור "רכוש עכשיו"
-        if ($(e.target).hasClass('buy-now') || $(e.target).closest('.buy-now').length) {
             return;
-        }
-        
-        // קבלת מזהה החבילה
-        var packageId = $(this).data('package-id');
-        var packageDetails = null;
-        
-        // חיפוש נתוני החבילה ממשתנה גלובלי
-        for (var i = 0; i < packageData.length; i++) {
-            if (packageData[i].productId === packageId) {
-                packageDetails = packageData[i];
-                break;
-            }
-        }
-        
-        if (!packageDetails) {
-            return;
-        }
-        
-        // בניית תוכן המודאל
-        var modalContent = '';
-        
-        // כותרת החבילה
-        var packageTitle = packageDetails.productId;
-        if (packageDetails.productDetails) {
-            for (var i = 0; i < packageDetails.productDetails.length; i++) {
-                if (packageDetails.productDetails[i].name === 'PLAN_TITLE' && packageDetails.productDetails[i].value) {
-                    packageTitle = packageDetails.productDetails[i].value;
-                    break;
-                }
-            }
-        }
-        
-        // חילוץ נתוני חבילה רלוונטיים
-        var dataLimit = '';
-        var dataUnit = '';
-        var validityDays = '';
-        
-        if (packageDetails.productDetails) {
-            for (var i = 0; i < packageDetails.productDetails.length; i++) {
-                var detail = packageDetails.productDetails[i];
-                
-                if (detail.name === 'PLAN_DATA_LIMIT' && detail.value) {
-                    dataLimit = detail.value;
-                }
-                
-                if (detail.name === 'PLAN_DATA_UNIT' && detail.value) {
-                    dataUnit = detail.value;
-                }
-                
-                if (detail.name === 'PLAN_VALIDITY' && detail.value) {
-                    validityDays = Math.round(parseInt(detail.value) / 24);
-                }
-            }
-        }
-        
-        // בניית כותרת מותאמת אישית
-        var customTitle = '';
-        var countriesCount = packageDetails.countries ? packageDetails.countries.length : 0;
-
-        // הוספת שם המדינה
-        if (hebrewCountry) {
-            customTitle += "חבילת גלישה ל" + hebrewCountry;
-            
-            // הוספת מספר מדינות נוספות אם יש יותר ממדינה אחת
-            if (countriesCount > 1) {
-                var additionalCountries = countriesCount - 1;
-                customTitle += " ועוד " + additionalCountries + " מדינות";
-            }
         } else {
-            // כותרת עם רק מספר מדינות אם אין מדינה ספציפית
-            customTitle += "חבילת גלישה ל-" + countriesCount + " מדינות";
+            return;
         }
 
-        // הוספת נפח הנתונים
-        if (dataLimit && dataUnit) {
-            customTitle += " עם " + dataLimit + " " + dataUnit;
-        }
+        $suggestions.removeClass('selected');
+        $current.addClass('selected').get(0)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
 
-        // הוספת תקופת התוקף
-        if (validityDays) {
-            customTitle += " למשך " + validityDays + " ימים";
-        }
+    // ניהול מודאל חבילות
+    $(document).on('click', '.package-clickable', function (e) {
+        if ($(e.target).closest('.buy-now').length) return;
 
-        modalContent += '<h2>' + customTitle + '</h2>';
-        
-        // מידע כללי
+        const packageId = $(this).data('package-id');
+        const packageDetails = packageData.find((p) => p.productId === packageId);
+        if (!packageDetails) return;
+
+        const { productDetails, retailPrice, currencyCode, providerName, countries } = packageDetails;
+        const dataLimit = productDetails?.find((d) => d.name === 'PLAN_DATA_LIMIT')?.value || '';
+        const dataUnit = productDetails?.find((d) => d.name === 'PLAN_DATA_UNIT')?.value || '';
+        const validityDays = productDetails?.find((d) => d.name === 'PLAN_VALIDITY')?.value
+            ? Math.round(parseInt(productDetails.find((d) => d.name === 'PLAN_VALIDITY').value) / 24)
+            : '';
+        const planTitle = productDetails?.find((d) => d.name === 'PLAN_TITLE')?.value || packageId;
+
+        let customTitle = hebrewCountry ? `חבילת גלישה ל${hebrewCountry}` : '';
+        if (countries?.length > 1) {
+            customTitle += ` ועוד ${countries.length - 1} מדינות`;
+        } else if (!hebrewCountry && countries?.length) {
+            customTitle = `חבילת גלישה ל${countries.length} מדינות`;
+        }
+        if (dataLimit && dataUnit) customTitle += ` עם ${dataLimit} ${dataUnit}`;
+        if (validityDays) customTitle += ` למשך ${validityDays} ימים`;
+
+        let modalContent = `<h2>${customTitle}</h2>`;
         modalContent += '<div class="modal-details">';
-        
-        // מידע בסיסי
         modalContent += '<div class="details-section">';
         modalContent += '<h4>פרטי חבילה</h4>';
-        
-        // מחיר
-        modalContent += '<p class="modal-price">' + packageDetails.retailPrice + ' ' + packageDetails.currencyCode + '</p>';
-        
-        // נתונים נוספים
-        if (dataLimit && dataUnit) {
-            modalContent += '<p><strong>נתונים:</strong> ' + dataLimit + ' ' + dataUnit + '</p>';
-        }
-        
-        if (validityDays) {
-            modalContent += '<p><strong>תוקף:</strong> ' + validityDays + ' ימים</p>';
-        }
-        
-        if (packageDetails.providerName) {
-            modalContent += '<p><strong>ספק:</strong> ' + packageDetails.providerName + '</p>';
-        }
-        
-        // תיאור מורחב
+        modalContent += `<p class="modal-price">${retailPrice} ${currencyCode}</p>`;
+        if (dataLimit && dataUnit) modalContent += `<p><strong>נתונים:</strong> ${dataLimit} ${dataUnit}</p>`;
+        if (validityDays) modalContent += `<p><strong>תוקף:</strong> ${validityDays} ימים</p>`;
+        if (providerName) modalContent += `<p><strong>ספק:</strong> ${providerName}</p>`;
         modalContent += '<div class="package-description">';
-        var description = "חבילת גלישה ל" + hebrewCountry;
-        if (dataLimit && validityDays) {
-            description += " עם " + dataLimit + " " + dataUnit + " למשך " + validityDays + " ימים.";
-        }
-        modalContent += '<p>' + description + '</p>';
-        modalContent += '</div>';
-        
-        modalContent += '</div>'; // סיום details-section
-        
-        // רשימת מדינות נתמכות
-        if (packageDetails.countries && packageDetails.countries.length > 0) {
+        modalContent += `<p>חבילת גלישה ל${hebrewCountry || countries?.length + ' מדינות'}</p>`;
+        modalContent += '</div></div>';
+
+        if (countries?.length) {
             modalContent += '<div class="details-section">';
-            modalContent += '<h4>כל המדינות הנתמכות (' + packageDetails.countries.length + ')</h4>';
+            modalContent += `<h4>כל המדינות הנתמכות (${countries.length})</h4>`;
             modalContent += '<div class="all-countries-grid">';
-            
-            packageDetails.countries.forEach(function(countryCode) {
-                // טיפול בקודי מדינה מיוחדים
-                var displayCode = countryCode;
-                if (countryCode.indexOf('-') !== -1) {
-                    displayCode = countryCode.split('-')[0];
-                }
-                
-                // ניסיון להמיר קוד ISO לשם מדינה בעברית
-                var countryName = countryCode; // ברירת מחדל
-                
-                // אנחנו מחפשים במשתנה countriesMapping שהועבר מ-PHP
-                for (var hebrew in countriesMapping) {
-                    if (countriesMapping[hebrew].iso === displayCode) {
-                        countryName = hebrew;
-                        break;
-                    }
-                }
-                
-                modalContent += '<div class="country-item">';
-                modalContent += '<img src="https://flagcdn.com/24x18/' + displayCode.toLowerCase() + '.png" alt="' + countryCode + '">';
-                modalContent += '<span>' + countryName + '</span>';
-                modalContent += '</div>';
+            countries.forEach((countryCode) => {
+                const displayCode = countryCode.split('-')[0];
+                const countryName = Object.keys(countriesMapping || {}).find(
+                    (key) => countriesMapping[key].iso === displayCode
+                ) || countryCode;
+                modalContent += `<div class="country-item">
+                    <img src="https://flagcdn.com/24x18/${displayCode.toLowerCase()}.png" alt="${countryName}">
+                    <span>${countryName}</span>
+                </div>`;
             });
-            
-            modalContent += '</div>'; // סיום all-countries-grid
-            modalContent += '</div>'; // סיום details-section
+            modalContent += '</div></div>';
         }
-        
-        modalContent += '</div>'; // סיום modal-details
-        
-        // כפתור רכישה
-        modalContent += '<form method="post" action="' + adminAjaxUrl.replace('admin-ajax.php', 'admin-post.php') + '">';
-        modalContent += '<input type="hidden" name="action" value="AdPro_process_package">';
-        modalContent += '<input type="hidden" name="package_id" value="' + packageDetails.productId + '">';
-        modalContent += '<input type="hidden" name="country" value="' + hebrewCountry + '">';
-        modalContent += '<button type="submit" class="buy-now-modal">רכוש עכשיו</button>';
-        modalContent += '</form>';
-        
-        // הזנת התוכן למודאל והצגתו
+
+        modalContent += '</div>';
+        modalContent += `<form method="post" action="${adminAjaxUrl.replace('admin-ajax.php', 'admin-post.php')}">
+            <input type="hidden" name="action" value="AdPro_process_package">
+            <input type="hidden" name="package_id" value="${packageId}">
+            <input type="hidden" name="country" value="${hebrewCountry}">
+            <button type="submit" class="buy-now-modal">רכוש עכשיו</button>
+        </form>`;
+
         $('#package-modal-content').html(modalContent);
         $('#package-details-modal').fadeIn();
     });
 
-    // סגירת המודאל
-    $(document).on('click', '.close-modal', function() {
-        $(this).closest('.package-modal').fadeOut();
-    });
-
-    // סגירה בלחיצה מחוץ למודאל
-    $(document).on('click', '.package-modal', function(e) {
-        if ($(e.target).hasClass('package-modal')) {
-            $(this).fadeOut();
+    $(document).on('click', '.close-modal, .package-modal', function (e) {
+        if (e.target === this || $(e.target).hasClass('close-modal')) {
+            $('.package-modal').fadeOut();
         }
     });
+
+    // הוספת כפתור סינון צף בתצוגת מובייל
+    if (window.innerWidth <= 768 && $('.package-filters').length) {
+        $('body').append('<button class="sticky-filter-button">פתח סינון מתקדם</button>');
+
+        $(document).on('click', '.sticky-filter-button', function () {
+            toggleMobileFilters();
+            if ($('.package-filters').hasClass('filters-open')) {
+                $('html, body').animate(
+                    { scrollTop: $('.package-filters').offset().top - 10 },
+                    200
+                );
+            }
+        });
+
+        $(window).on('scroll', function () {
+            if ($('.package-filters').length) {
+                const filterSectionTop = $('.package-filters').offset().top;
+                const filterSectionHeight = $('.package-filters').outerHeight();
+                const scrollPosition = $(window).scrollTop();
+
+                if (
+                    scrollPosition + 50 < filterSectionTop ||
+                    scrollPosition > filterSectionTop + filterSectionHeight - 100
+                ) {
+                    $('.sticky-filter-button').addClass('visible');
+                } else {
+                    $('.sticky-filter-button').removeClass('visible');
+                }
+            }
+        });
+
+        $(window).trigger('scroll');
+    }
 });

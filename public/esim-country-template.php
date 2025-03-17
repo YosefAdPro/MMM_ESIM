@@ -213,6 +213,10 @@ if ($country_data) {
                                 }
                             }
                         }
+						
+		//				echo '<div class="package-id-info">';
+//echo 'כותרת: ' . esc_html($package_title) . ' | מזהה: ' . esc_html($package['productId']);
+//echo '</div>';
                         
                         // אם חסר כותרת, השתמש במזהה המוצר
                         if (empty($package_title)) {
@@ -254,26 +258,29 @@ if (!empty($validity_days)) {
 <div class="package-details">
     <p class="price"><?php echo esc_html($price); ?> <?php echo esc_html($currency); ?></p>
     
-    <?php if (!empty($data_limit) && !empty($data_unit)) : ?>
-        <p class="data">
-            <i class="fas fa-database"></i>
-            <strong>נתונים:</strong> <?php echo esc_html($data_limit . ' ' . $data_unit); ?>
-        </p>
-    <?php endif; ?>
-    
-    <?php if (!empty($validity_days)) : ?>
-        <p class="validity">
-            <i class="far fa-calendar-alt"></i>
-            <strong>תוקף:</strong> <?php echo esc_html($validity_days); ?> ימים
-        </p>
-    <?php endif; ?>
-    
-    <?php if (isset($package['providerName'])) : ?>
-        <p class="provider">
-            <i class="fas fa-broadcast-tower"></i>
-            <strong>ספק:</strong> <?php echo esc_html($package['providerName']); ?>
-        </p>
-    <?php endif; ?>
+    <!-- הצגת מידע חבילה בשורה אחת -->
+    <div class="package-info-row">
+        <?php if (!empty($data_limit) && !empty($data_unit)) : ?>
+            <div class="info-item">
+                <span class="info-label">נתונים:</span>
+                <span class="info-value"><?php echo esc_html($data_limit . '' . $data_unit); ?></span>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (!empty($validity_days)) : ?>
+            <div class="info-item">
+                <span class="info-label">תוקף:</span>
+                <span class="info-value"><?php echo esc_html($validity_days); ?> ימים</span>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($package['providerName'])) : ?>
+            <div class="info-item">
+                <span class="info-label">ספק:</span>
+                <span class="info-value"><?php echo esc_html($package['providerName']); ?></span>
+            </div>
+        <?php endif; ?>
+    </div>
                             <div class="package-description">
                                 <?php
                                 $description = "חבילת גלישה ל" . esc_html($hebrew_country);

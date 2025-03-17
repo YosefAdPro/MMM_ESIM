@@ -55,6 +55,11 @@ return [
         'english' => 'CROATIA',
         'iso' => 'HR',
         'slug' => 'croatia'
+    ],    
+	'מולדובה' => [
+        'english' => 'MOLDOVA',
+        'iso' => 'MD',
+        'slug' => 'moldova'
     ],
     'קפריסין' => [
         'english' => 'CYPRUS',

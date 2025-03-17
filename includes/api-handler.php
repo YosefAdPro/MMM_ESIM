@@ -7,9 +7,19 @@ if (!defined('ABSPATH')) {
     exit; // יציאה אם הגישה ישירה
 }
 
+// הגדר שערי חליפין קבועים (אפשר לעדכן ידנית לפי הצורך)
+function AdPro_get_exchange_rates() {
+    return [
+        'USD' => 1,      // דולר (בסיס)
+        'ILS' => 3.7,    // שקל ישראלי
+        'EUR' => 0.92,   // אירו
+        'GBP' => 0.79    // ליש"ט
+    ];
+}
+
 
 /**
- * פונקציה לסינון חבילות כפולות ולהשאיר רק את הזולות ביותר
+ * פונקציה משופרת לסינון חבילות דומות ולהשאיר רק את הזולות ביותר
  * 
  * @param array $packages מערך של חבילות
  * @return array מערך מסונן של חבילות
@@ -25,6 +35,9 @@ function AdPro_filter_duplicate_packages($packages) {
     // מערך עזר לבדיקת חבילות דומות
     $package_fingerprints = [];
     
+    // מידע דיבוג
+    $debug_info = [];
+    
     foreach ($packages as $package) {
         // בדיקת תקינות המידע
         if (!isset($package['productDetails']) || !is_array($package['productDetails']) || 
@@ -36,6 +49,10 @@ function AdPro_filter_duplicate_packages($packages) {
         $data_limit = '';
         $data_unit = '';
         $validity_days = '';
+        $provider_name = isset($package['providerName']) ? $package['providerName'] : '';
+        $countries = isset($package['countries']) ? $package['countries'] : [];
+        $countries_count = count($countries);
+        $main_country = !empty($countries) ? $countries[0] : '';
         
         foreach ($package['productDetails'] as $detail) {
             if ($detail['name'] === 'PLAN_DATA_LIMIT' && !empty($detail['value'])) {
@@ -49,34 +66,139 @@ function AdPro_filter_duplicate_packages($packages) {
             }
         }
         
-        // יצירת טביעת אצבע ייחודית לחבילה
-        // שילוב של נפח הנתונים, יחידת הנתונים, תקופת התוקף ומדינות נתמכות
-        $countries = isset($package['countries']) ? $package['countries'] : [];
-        sort($countries); // מיון כדי שסדר המדינות לא ישפיע
-        $countries_hash = md5(json_encode($countries));
+        // יצירת טביעת אצבע ייחודית - משתמשת בנתונים, תוקף, מדינה ראשית ומספר המדינות
+        $fingerprint = "{$data_limit}_{$data_unit}_{$validity_days}_{$main_country}_{$countries_count}";
         
-        $fingerprint = "{$data_limit}_{$data_unit}_{$validity_days}_{$countries_hash}";
+        // שמירת מידע לדיבוג
+        $debug = [
+            'id' => $package['productId'],
+            'title' => isset($package['title']) ? $package['title'] : '',
+            'provider' => $provider_name,
+            'data' => "{$data_limit} {$data_unit}",
+            'validity' => "{$validity_days} days",
+            'price' => $package['retailPrice'],
+            'countries_count' => $countries_count,
+            'fingerprint' => $fingerprint
+        ];
         
         // בדיקה אם ראינו כבר חבילה דומה
         if (isset($package_fingerprints[$fingerprint])) {
             // השוואת מחירים
-            $existing_package = $unique_packages[$package_fingerprints[$fingerprint]];
+            $existing_index = $package_fingerprints[$fingerprint];
+            $existing_package = $unique_packages[$existing_index];
+            
+            // שמירת מידע דיבוג
+            if (!isset($debug_info[$fingerprint])) {
+                $debug_info[$fingerprint] = ['packages' => [], 'chosen' => null];
+            }
+            $debug_info[$fingerprint]['packages'][] = $debug;
             
             // אם החבילה הנוכחית זולה יותר, החלף את הקיימת
             if (floatval($package['retailPrice']) < floatval($existing_package['retailPrice'])) {
-                $unique_packages[$package_fingerprints[$fingerprint]] = $package;
+                $debug_info[$fingerprint]['chosen'] = $package['productId'] . ' (cheaper)';
+                $unique_packages[$existing_index] = $package;
+            } else {
+                $debug_info[$fingerprint]['chosen'] = $existing_package['productId'] . ' (kept)';
             }
         } else {
             // זו חבילה חדשה - הוסף אותה למערך
             $index = count($unique_packages);
             $unique_packages[] = $package;
             $package_fingerprints[$fingerprint] = $index;
+            
+            // שמירת מידע דיבוג
+            $debug_info[$fingerprint] = ['packages' => [$debug], 'chosen' => $package['productId'] . ' (first)'];
         }
     }
+    
+    // שמירת מידע הדיבוג
+    update_option('AdPro_duplicate_filter_debug', $debug_info);
+    
+    // מיון לפי מחיר מהזול ליקר
+    usort($unique_packages, function($a, $b) {
+        return floatval($a['retailPrice']) - floatval($b['retailPrice']);
+    });
     
     // החזר מערך של חבילות ייחודיות
     return array_values($unique_packages);
 }
+
+/**
+ * פונקציה לתצוגת דיבוג של סינון חבילות דומות
+ */
+function AdPro_display_duplicate_filter_debug() {
+    if (!current_user_can('manage_options') || !isset($_GET['debug_filter'])) {
+        return;
+    }
+    
+    $debug_info = get_option('AdPro_duplicate_filter_debug', []);
+    
+    echo '<div style="background: #f0f8ff; padding: 15px; margin: 20px 0; border-left: 5px solid #0073aa;">';
+    echo '<h2>סינון חבילות דומות - מידע דיבוג</h2>';
+    
+    if (empty($debug_info)) {
+        echo '<p>אין מידע דיבוג זמין. ייתכן שהפונקציה AdPro_filter_duplicate_packages טרם רצה.</p>';
+        echo '</div>';
+        return;
+    }
+    
+    echo '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
+    echo '<tr style="background-color: #eee;">';
+    echo '<th style="text-align: right; padding: 8px; border: 1px solid #ddd;">טביעת אצבע</th>';
+    echo '<th style="text-align: right; padding: 8px; border: 1px solid #ddd;">חבילות דומות</th>';
+    echo '<th style="text-align: right; padding: 8px; border: 1px solid #ddd;">חבילה שנבחרה</th>';
+    echo '</tr>';
+    
+    foreach ($debug_info as $fingerprint => $info) {
+        echo '<tr>';
+        echo '<td style="vertical-align: top; padding: 8px; border: 1px solid #ddd;">' . esc_html($fingerprint) . '</td>';
+        
+        echo '<td style="vertical-align: top; padding: 8px; border: 1px solid #ddd;">';
+        foreach ($info['packages'] as $pkg) {
+            echo '<div style="margin-bottom: 10px; padding: 8px; border: 1px solid #eee; background: ' . ($info['chosen'] == $pkg['id'] . ' (cheaper)' || $info['chosen'] == $pkg['id'] . ' (first)' || $info['chosen'] == $pkg['id'] . ' (kept)' ? '#e8f5e9' : '#fff') . ';">';
+            echo '<strong>מזהה:</strong> ' . esc_html($pkg['id']) . '<br>';
+            echo '<strong>כותרת:</strong> ' . esc_html($pkg['title']) . '<br>';
+            echo '<strong>ספק:</strong> ' . esc_html($pkg['provider']) . '<br>';
+            echo '<strong>נתונים:</strong> ' . esc_html($pkg['data']) . '<br>';
+            echo '<strong>תוקף:</strong> ' . esc_html($pkg['validity']) . '<br>';
+            echo '<strong>מחיר:</strong> ' . esc_html($pkg['price']) . '<br>';
+            echo '<strong>מספר מדינות:</strong> ' . esc_html($pkg['countries_count']) . '<br>';
+            echo '</div>';
+        }
+        echo '</td>';
+        
+        echo '<td style="vertical-align: top; padding: 8px; border: 1px solid #ddd;">' . esc_html($info['chosen']) . '</td>';
+        echo '</tr>';
+    }
+    
+    echo '</table>';
+    echo '</div>';
+}
+
+// הוספת פונקציית הדיבוג לתחתית הדף
+add_action('wp_footer', 'AdPro_display_duplicate_filter_debug');
+
+
+/**
+ * פונקציה לעיגול חכם של מחירים לתצוגה
+ * 
+ * @param float $price המחיר המקורי
+ * @return string המחיר המעוגל בצורה חכמה
+ */
+function AdPro_get_smart_display_price($price) {
+    // עיגול המחיר לספרה עשרונית אחת
+    $rounded = round($price, 1);
+    
+    // בדיקה אם המספר המעוגל הוא בעצם מספר שלם
+    if (floor($rounded) == $rounded) {
+        // אם כן, הצג ללא נקודה עשרונית
+        return number_format(floor($rounded), 0);
+    } else {
+        // אחרת, הצג עם ספרה עשרונית אחת
+        return number_format($rounded, 1);
+    }
+}
+
 
 /**
  * קבלת חבילות eSIM לפי מדינה
@@ -84,6 +206,7 @@ function AdPro_filter_duplicate_packages($packages) {
  * @param string $country קוד מדינה
  * @return array מערך של חבילות
  */
+ 
 function AdPro_esim_get_packages($country = '') {
     // אם ביקשו מדינה ספציפית
     if (!empty($country)) {
@@ -107,7 +230,25 @@ function AdPro_esim_get_packages($country = '') {
                     });
                     $packages = array_values($packages);
                 }
-                
+                // עיגול חכם של המחירים לתצוגה
+foreach ($packages as &$package) {
+    if (isset($package['retailPrice'])) {
+        // שמירת המחיר המקורי לפני העיגול למקרה שנצטרך אותו
+        $package['original_price'] = $package['retailPrice'];
+        
+        // עיגול המחיר בצורה חכמה - המרה למספר
+        $rounded_price = (float)AdPro_get_smart_display_price(floatval($package['retailPrice']));
+        $package['display_price'] = AdPro_get_smart_display_price(floatval($package['retailPrice']));
+        
+        // עדכון המחיר ב-package
+        $package['retailPrice'] = $rounded_price;
+    }
+}
+
+// סינון חבילות כפולות לאחר העיגול (אם צריך)
+$packages = AdPro_filter_duplicate_packages($packages);
+
+// החזרת החבילות המעודכנות
                 return $packages;
             }
         }
