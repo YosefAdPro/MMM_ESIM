@@ -41,6 +41,9 @@ function AdPro_get_or_create_esim_product() {
  * טיפול בתהליך הרכישה מדף החבילות
  */
 // עדכן את הקוד בקובץ woocommerce-esim-integration.php בתהליך בחירת חבילה
+/**
+ * טיפול בתהליך הרכישה מדף החבילות כולל המרת מטבע לשקלים
+ */
 function AdPro_process_package_selection() {
     // בדיקה אם WooCommerce פעיל וזמין
     if (!function_exists('WC') || !class_exists('WooCommerce')) {
@@ -119,9 +122,35 @@ function AdPro_process_package_selection() {
     
     $product->set_name($title);
     
+    // המרת מחיר מדולר לשקל אם צריך
     if (isset($package['retailPrice']) && !empty($package['retailPrice'])) {
-        $product->set_price($package['retailPrice']);
-        $product->set_regular_price($package['retailPrice']);
+        $price = floatval($package['retailPrice']);
+        $currency = isset($package['currencyCode']) ? $package['currencyCode'] : 'USD';
+        
+        // המרה לשקלים אם המחיר אינו בשקלים
+        if ($currency !== 'ILS') {
+            // קבלת שערי חליפין
+            $exchange_rates = AdPro_get_exchange_rates();
+            
+            // חישוב המחיר בשקלים
+            if ($currency === 'USD') {
+                // המרה ישירה מדולר לשקל לפי השער
+                $price_in_ils = $price * $exchange_rates['ILS'];
+            } elseif (isset($exchange_rates[$currency])) {
+                // המרה דרך דולר כמטבע בסיס
+                $price_in_usd = $price / $exchange_rates[$currency];
+                $price_in_ils = $price_in_usd * $exchange_rates['ILS'];
+            } else {
+                // אם אין שער חליפין, נשתמש בדולרים
+                $price_in_ils = $price * $exchange_rates['ILS'];
+            }
+            
+            // עיגול המחיר למספר עם שתי ספרות אחרי הנקודה
+            $price = round($price_in_ils, 2);
+        }
+        
+        $product->set_price($price);
+        $product->set_regular_price($price);
     }
     
     $product->save();
@@ -138,6 +167,8 @@ function AdPro_process_package_selection() {
         'esim_data_unit' => $data_unit,
         'esim_validity_days' => $validity_days,
         'esim_package_data' => json_encode($package),
+        'esim_original_currency' => $currency,
+        'esim_original_price' => isset($package['retailPrice']) ? $package['retailPrice'] : '',
         'unique_key' => md5(microtime().rand()) // מניעת איחוד פריטים
     ];
     
@@ -158,6 +189,9 @@ add_action('admin_post_nopriv_AdPro_process_package', 'AdPro_process_package_sel
 
 /**
  * הצגת המידע המותאם על החבילה בעגלה
+ */
+/**
+ * הצגת המידע המותאם על החבילה בעגלה כולל מידע על המרת מטבע
  */
 function AdPro_display_cart_item_custom_data($item_data, $cart_item) {
     if (isset($cart_item['esim_country'])) {
@@ -190,6 +224,28 @@ function AdPro_display_cart_item_custom_data($item_data, $cart_item) {
         $item_data[] = [
             'key' => 'תקופת תוקף',
             'value' => $cart_item['esim_validity_days'] . ' ימים'
+        ];
+    }
+    
+    // הוספת מידע על המרת מטבע אם רלוונטי
+    if (isset($cart_item['esim_original_currency']) && isset($cart_item['esim_original_price']) &&
+        $cart_item['esim_original_currency'] !== 'ILS') {
+        
+        // הצגת המחיר המקורי והמטבע
+        $original_currency = $cart_item['esim_original_currency'];
+        $original_price = $cart_item['esim_original_price'];
+        
+        // בחירת הסימן המתאים למטבע
+        $currency_symbol = '$'; // ברירת מחדל לדולר
+        if ($original_currency === 'EUR') {
+            $currency_symbol = '€';
+        } elseif ($original_currency === 'GBP') {
+            $currency_symbol = '£';
+        }
+        
+        $item_data[] = [
+            'key' => 'מחיר מקורי',
+            'value' => $currency_symbol . $original_price . ' (' . $original_currency . ')'
         ];
     }
     

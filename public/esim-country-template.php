@@ -214,7 +214,7 @@ if ($country_data) {
                             }
                         }
 						
-		//				echo '<div class="package-id-info">';
+//						echo '<div class="package-id-info">';
 //echo 'כותרת: ' . esc_html($package_title) . ' | מזהה: ' . esc_html($package['productId']);
 //echo '</div>';
                         
@@ -256,8 +256,23 @@ if (!empty($validity_days)) {
 <h2><?php echo $custom_title; ?></h2>
                         
 <div class="package-details">
-    <p class="price"><?php echo esc_html($price); ?> <?php echo esc_html($currency); ?></p>
+    <!-- עבור הצגת אייקון דולר במקום USD -->
+<p class="price">
+    <?php
+    // בדיקה אם המטבע הוא דולר
+    if ($currency === 'USD') {
+        echo '<span class="currency-icon">$</span> ';  // אייקון דולר
+    } elseif ($currency === 'EUR') {
+        echo '<span class="currency-icon">€</span> ';  // אייקון יורו
+    } elseif ($currency === 'GBP') {
+        echo '<span class="currency-icon">£</span> ';  // אייקון ליש"ט
+    } else {
+        echo '<span class="currency-name">' . esc_html($currency) . '</span> ';  // קוד המטבע המקורי
+    }
     
+    echo esc_html($price);
+    ?>
+</p>    
     <!-- הצגת מידע חבילה בשורה אחת -->
     <div class="package-info-row">
         <?php if (!empty($data_limit) && !empty($data_unit)) : ?>

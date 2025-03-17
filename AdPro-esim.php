@@ -166,7 +166,7 @@ add_filter('woocommerce_account_menu_items', 'AdPro_esim_account_menu_items');
  * @return array נתוני שימוש
  */
 function AdPro_get_esim_usage_data($order_id) {
-    // תמיד החזר נתוני דוגמה בשלב הפיתוח
+ /*   // תמיד החזר נתוני דוגמה בשלב הפיתוח
     return [
         "ussdCode" => null,
         "esim" => [
@@ -200,11 +200,13 @@ function AdPro_get_esim_usage_data($order_id) {
             ]
         ]
     ];
-    
+ */   
     // הקוד המקורי לא ירוץ כי יש return למעלה
     if (empty($order_id)) {
         return [];
     }
+	
+	
     
     // הגדרת מפתח מטמון
     $cache_key = 'esim_usage_' . $order_id;

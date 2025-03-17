@@ -183,58 +183,113 @@ function filterPackages() {
     });
 
     // ניהול מודאל חבילות
-    $(document).on('click', '.package-clickable', function (e) {
-        if ($(e.target).closest('.buy-now').length) return;
+// עדכון פונקציית יצירת המודאל
+$(document).on('click', '.package-clickable', function (e) {
+    if ($(e.target).closest('.buy-now').length) return;
 
-        const packageId = $(this).data('package-id');
-        const packageDetails = packageData.find((p) => p.productId === packageId);
-        if (!packageDetails) return;
+    const packageId = $(this).data('package-id');
+    const packageDetails = packageData.find((p) => p.productId === packageId);
+    if (!packageDetails) return;
 
-        const { productDetails, retailPrice, currencyCode, providerName, countries } = packageDetails;
-        const dataLimit = productDetails?.find((d) => d.name === 'PLAN_DATA_LIMIT')?.value || '';
-        const dataUnit = productDetails?.find((d) => d.name === 'PLAN_DATA_UNIT')?.value || '';
-        const validityDays = productDetails?.find((d) => d.name === 'PLAN_VALIDITY')?.value
-            ? Math.round(parseInt(productDetails.find((d) => d.name === 'PLAN_VALIDITY').value) / 24)
-            : '';
-        const planTitle = productDetails?.find((d) => d.name === 'PLAN_TITLE')?.value || packageId;
+    const { productDetails, retailPrice, currencyCode, providerName, countries } = packageDetails;
+    const dataLimit = productDetails?.find((d) => d.name === 'PLAN_DATA_LIMIT')?.value || '';
+    const dataUnit = productDetails?.find((d) => d.name === 'PLAN_DATA_UNIT')?.value || '';
+    const validityDays = productDetails?.find((d) => d.name === 'PLAN_VALIDITY')?.value
+        ? Math.round(parseInt(productDetails.find((d) => d.name === 'PLAN_VALIDITY').value) / 24)
+        : '';
+    const planTitle = productDetails?.find((d) => d.name === 'PLAN_TITLE')?.value || packageId;
 
-        let customTitle = hebrewCountry ? `חבילת גלישה ל${hebrewCountry}` : '';
-        if (countries?.length > 1) {
-            customTitle += ` ועוד ${countries.length - 1} מדינות`;
-        } else if (!hebrewCountry && countries?.length) {
-            customTitle = `חבילת גלישה ל${countries.length} מדינות`;
-        }
-        if (dataLimit && dataUnit) customTitle += ` עם ${dataLimit} ${dataUnit}`;
-        if (validityDays) customTitle += ` למשך ${validityDays} ימים`;
+    let customTitle = hebrewCountry ? `חבילת גלישה ל${hebrewCountry}` : '';
+    if (countries?.length > 1) {
+        customTitle += ` ועוד ${countries.length - 1} מדינות`;
+    } else if (!hebrewCountry && countries?.length) {
+        customTitle = `חבילת גלישה ל${countries.length} מדינות`;
+    }
+    if (dataLimit && dataUnit) customTitle += ` עם ${dataLimit} ${dataUnit}`;
+    if (validityDays) customTitle += ` למשך ${validityDays} ימים`;
 
-        let modalContent = `<h2>${customTitle}</h2>`;
-        modalContent += '<div class="modal-details">';
-        modalContent += '<div class="details-section">';
-        modalContent += '<h4>פרטי חבילה</h4>';
-        modalContent += `<p class="modal-price">${retailPrice} ${currencyCode}</p>`;
-        if (dataLimit && dataUnit) modalContent += `<p><strong>נתונים:</strong> ${dataLimit} ${dataUnit}</p>`;
-        if (validityDays) modalContent += `<p><strong>תוקף:</strong> ${validityDays} ימים</p>`;
-        if (providerName) modalContent += `<p><strong>ספק:</strong> ${providerName}</p>`;
-        modalContent += '<div class="package-description">';
-        modalContent += `<p>חבילת גלישה ל${hebrewCountry || countries?.length + ' מדינות'}</p>`;
-        modalContent += '</div></div>';
+    let modalContent = `<h2>${customTitle}</h2>`;
+    modalContent += '<div class="modal-details">';
+    modalContent += '<div class="details-section">';
+    modalContent += '<h4>פרטי חבילה</h4>';
 
-        if (countries?.length) {
-            modalContent += '<div class="details-section">';
-            modalContent += `<h4>כל המדינות הנתמכות (${countries.length})</h4>`;
-            modalContent += '<div class="all-countries-grid">';
-            countries.forEach((countryCode) => {
-                const displayCode = countryCode.split('-')[0];
-                const countryName = Object.keys(countriesMapping || {}).find(
-                    (key) => countriesMapping[key].iso === displayCode
-                ) || countryCode;
-                modalContent += `<div class="country-item">
-                    <img src="https://flagcdn.com/24x18/${displayCode.toLowerCase()}.png" alt="${countryName}">
-                    <span>${countryName}</span>
+    // עדכון הצגת המחיר - במקום להציג currencyCode נציג אייקון
+    let currencySymbol = '';
+    if (currencyCode === 'USD') {
+        currencySymbol = '$';
+    } else if (currencyCode === 'EUR') {
+        currencySymbol = '€';
+    } else if (currencyCode === 'GBP') {
+        currencySymbol = '£';
+    } else {
+        currencySymbol = currencyCode;
+    }
+    
+    // שינוי סדר ההצגה - קודם המחיר ואז סימן המטבע
+    modalContent += `<p class="modal-price">${retailPrice} <span class="currency-symbol">${currencySymbol}</span></p>`;
+    
+    if (dataLimit && dataUnit) modalContent += `<p><strong>נתונים:</strong> ${dataLimit} ${dataUnit}</p>`;
+    if (validityDays) modalContent += `<p><strong>תוקף:</strong> ${validityDays} ימים</p>`;
+    if (providerName) modalContent += `<p><strong>ספק:</strong> ${providerName}</p>`;
+    modalContent += '<div class="package-description">';
+    modalContent += `<p>חבילת גלישה ל${hebrewCountry || countries?.length + ' מדינות'}</p>`;
+    modalContent += '</div></div>';
+
+
+if (countries?.length) {
+    modalContent += '<div class="details-section">';
+    modalContent += `<h4>כל המדינות הנתמכות (${countries.length})</h4>`;
+    
+    // מתחיל טבלה דו-טורית
+    modalContent += '<div class="countries-supported-grid">';
+    
+    // מסדר את המדינות בזוגות (שמאל-ימין)
+    for (let i = 0; i < countries.length; i += 2) {
+        modalContent += '<div class="country-row">';
+        
+        // הצד הימני של השורה (אם קיים)
+        if (i < countries.length) {
+            const rightCountryCode = countries[i];
+            const displayCodeRight = rightCountryCode.split('-')[0];
+            const countryNameRight = Object.keys(countriesMapping || {}).find(
+                (key) => countriesMapping[key].iso === displayCodeRight
+            ) || rightCountryCode;
+            
+            modalContent += `
+                <div class="country-cell">
+                    <div class="country-flag-name">
+                        <span class="country-name">${countryNameRight}</span>
+                        <img src="https://flagcdn.com/24x18/${displayCodeRight.toLowerCase()}.png" alt="${countryNameRight}">
+                    </div>
                 </div>`;
-            });
-            modalContent += '</div></div>';
         }
+        
+        // הצד השמאלי של השורה (אם קיים)
+        if (i + 1 < countries.length) {
+            const leftCountryCode = countries[i + 1];
+            const displayCodeLeft = leftCountryCode.split('-')[0];
+            const countryNameLeft = Object.keys(countriesMapping || {}).find(
+                (key) => countriesMapping[key].iso === displayCodeLeft
+            ) || leftCountryCode;
+            
+            modalContent += `
+                <div class="country-cell">
+                    <div class="country-flag-name">
+                        <img src="https://flagcdn.com/24x18/${displayCodeLeft.toLowerCase()}.png" alt="${countryNameLeft}">
+                        <span class="country-name">${countryNameLeft}</span>
+                    </div>
+                </div>`;
+        } else {
+            // אם אין מדינה שנייה בזוג, הוסף תא ריק
+            modalContent += '<div class="country-cell"></div>';
+        }
+        
+        modalContent += '</div>'; // סגירת country-row
+    }
+    
+    modalContent += '</div>'; // סגירת countries-supported-grid
+    modalContent += '</div>'; // סגירת details-section
+}
 
         modalContent += '</div>';
         modalContent += `<form method="post" action="${adminAjaxUrl.replace('admin-ajax.php', 'admin-post.php')}">

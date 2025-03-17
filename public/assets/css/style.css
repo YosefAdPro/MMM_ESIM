@@ -43,6 +43,18 @@ body {
     border-radius: var(--border-radius);
 }
 
+
+/* הוסף את הסגנונות האלה לקובץ CSS שלך */
+.currency-icon {
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-right: 0; /* אפס רווח מימין */
+    margin-left: 2px; /* רווח קטן משמאל, כדי שיראה צמוד למספר אבל לא יתנגש בו */
+    color: #ff6600; /* צבע כתום דומה לזה שבתמונה */
+}
+
+
+
 /* כותרת ראשית */
 .country-header {
     text-align: center;
@@ -222,16 +234,55 @@ body {
     font-weight: 500;
 }
 
-/* מודאל - גרסת פנימית של country-item */
-.all-countries-grid .country-item {
-    font-size: 0.85rem;
-    padding: 5px;
+
+
+/* סגנון טבלאי לרשימת המדינות במודאל */
+.countries-supported-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
 }
 
-.all-countries-grid .country-item img {
-    margin-bottom: 5px;
-    border-radius: 3px;
+.country-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
+
+.country-cell {
+    flex: 0 0 48%;
+    padding: 8px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.country-flag-name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.country-flag-name img {
+    width: 24px;
+    height: 18px;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.country-name {
+    font-size: 14px;
+    color: #333;
+}
+
+
+
 
 /* =================================
    פילטר חבילות 
@@ -306,6 +357,21 @@ body {
     
     .package-filters.filters-open .filter-content {
         display: block !important; /* מוצג כאשר יש קלאס filters-open - עם !important להגברת עדיפות */
+    }
+	
+	/* בטלפונים נשאר בתצוגה דו-טורית */
+
+    .country-flag-name {
+        font-size: 12px;
+    }
+    
+    .country-cell {
+        padding: 5px;
+    }
+    
+    .country-flag-name img {
+        width: 20px;
+        height: 15px;
     }
 }
 
@@ -458,12 +524,16 @@ select:focus {
     font-size: 2rem;
     font-weight: 700;
     text-align: center;
+	align-items: center;
     color: var(--accent-color);
     margin: 0 0 15px 0;
-    display: block;
+    display: flex;
 	margin-bottom: 10px; /* במקום 15px */
+	    justify-content: center;
+    gap: 2px; /* רווח מינימלי בין האלמנטים */
 
 }
+
 
 
 
@@ -740,16 +810,7 @@ select:focus {
     display: block;
 }
 
-.all-countries-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-}
+
 
 .buy-now-modal {
     width: 100%;
@@ -1419,6 +1480,21 @@ select:focus {
         background-color: #0055b3;
         transform: translateY(-5px);
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+	
+	/* בטלפונים נשאר בתצוגה דו-טורית */
+
+    .country-flag-name {
+        font-size: 12px;
+    }
+    
+    .country-cell {
+        padding: 5px;
+    }
+    
+    .country-flag-name img {
+        width: 20px;
+        height: 15px;
     }
 }
 

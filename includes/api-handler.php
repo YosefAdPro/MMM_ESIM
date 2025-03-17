@@ -8,13 +8,58 @@ if (!defined('ABSPATH')) {
 }
 
 // הגדר שערי חליפין קבועים (אפשר לעדכן ידנית לפי הצורך)
+/**
+ * פונקציה לקבלת שערי חליפין עדכניים
+ * 
+ * @return array מערך של שערי חליפין
+ */
 function AdPro_get_exchange_rates() {
-    return [
-        'USD' => 1,      // דולר (בסיס)
-        'ILS' => 3.7,    // שקל ישראלי
-        'EUR' => 0.92,   // אירו
-        'GBP' => 0.79    // ליש"ט
-    ];
+    // נסה לקבל שערי חליפין מהמטמון
+    $exchange_rates = get_transient('adpro_exchange_rates');
+    
+    // אם אין במטמון, קבל שערים עדכניים
+    if (false === $exchange_rates) {
+        // נסה לקבל שערים מ-API חיצוני
+        $api_url = 'https://open.er-api.com/v6/latest/USD';
+        $response = wp_remote_get($api_url, ['timeout' => 10]);
+        
+        if (!is_wp_error($response) && 200 === wp_remote_retrieve_response_code($response)) {
+            $data = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (isset($data['rates'])) {
+                $exchange_rates = [
+                    'USD' => 1,      // דולר (בסיס)
+                    'ILS' => $data['rates']['ILS'] ?? 3.7,    // שקל ישראלי
+                    'EUR' => $data['rates']['EUR'] ?? 0.92,   // אירו
+                    'GBP' => $data['rates']['GBP'] ?? 0.79    // ליש"ט
+                ];
+                
+                // שמור במטמון ל-24 שעות
+                set_transient('adpro_exchange_rates', $exchange_rates, 24 * HOUR_IN_SECONDS);
+                
+                // תיעוד ההצלחה
+                error_log('AdPro eSIM: Updated exchange rates from API');
+                
+                return $exchange_rates;
+            }
+        }
+        
+        // אם ה-API נכשל, השתמש בערכים קבועים
+        $exchange_rates = [
+            'USD' => 1,      // דולר (בסיס)
+            'ILS' => 3.7,    // שקל ישראלי
+            'EUR' => 0.92,   // אירו
+            'GBP' => 0.79    // ליש"ט
+        ];
+        
+        // שמירה במטמון ל-6 שעות (זמן קצר יותר כי אלו ערכי ברירת מחדל)
+        set_transient('adpro_exchange_rates', $exchange_rates, 6 * HOUR_IN_SECONDS);
+        
+        // תיעוד השימוש בערכי ברירת מחדל
+        error_log('AdPro eSIM: Using default exchange rates');
+    }
+    
+    return $exchange_rates;
 }
 
 
