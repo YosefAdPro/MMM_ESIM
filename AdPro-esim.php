@@ -73,6 +73,10 @@ add_action('plugins_loaded', function() {
     
     // טעינת קובץ האינטגרציה החדש עם תוסף iCount רשמי
     require_once plugin_dir_path(__FILE__) . 'includes/icount-integration.php';
+	
+	    if (is_admin()) {
+        require_once plugin_dir_path(__FILE__) . 'admin/troubleshooter.php';
+    }
 }, 5);
 
 /**
