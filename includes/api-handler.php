@@ -245,14 +245,140 @@ function AdPro_get_smart_display_price($price) {
 }
 
 
+
 /**
- * קבלת חבילות eSIM לפי מדינה
+ * פונקציה לקבלת חבילות eSIM ממסד הנתונים לפי מדינה.
+ * אם אין חבילות במסד הנתונים, מנסה לקרוא ישירות מה-API כגיבוי.
  * 
  * @param string $country קוד מדינה
  * @return array מערך של חבילות
  */
- 
 function AdPro_esim_get_packages($country = '') {
+    global $wpdb;
+    
+    // בדוק אם טבלת החבילות קיימת
+    $table_packages = $wpdb->prefix . 'adpro_esim_packages';
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_packages'") == $table_packages;
+    
+    // אם הטבלה לא קיימת, ננסה להשתמש בקבצי JSON כגיבוי
+    if (!$table_exists) {
+        error_log("Table $table_packages does not exist, falling back to JSON files");
+        return AdPro_esim_get_packages_from_json($country);
+    }
+    
+    // מערך להחזרה
+    $packages = [];
+    
+    // סינון ספקים מוסתרים
+    $hidden_providers = get_option('AdPro_hidden_providers', []);
+    $hidden_providers_sql = '';
+    
+    if (!empty($hidden_providers) && is_array($hidden_providers)) {
+        $placeholders = implode(',', array_fill(0, count($hidden_providers), '%s'));
+        $hidden_providers_sql = $wpdb->prepare(" AND provider_id NOT IN ($placeholders) ", $hidden_providers);
+    }
+    
+    // שאילתה לפי מדינה אם צוינה
+    if (!empty($country)) {
+        $sql = $wpdb->prepare(
+            "SELECT * FROM $table_packages WHERE country_iso = %s $hidden_providers_sql ORDER BY retail_price ASC",
+            $country
+        );
+    } else {
+        // שאילתה לכל החבילות
+        $sql = "SELECT * FROM $table_packages WHERE 1=1 $hidden_providers_sql ORDER BY retail_price ASC";
+    }
+    
+    // ביצוע השאילתה
+    $results = $wpdb->get_results($sql, ARRAY_A);
+    
+    if (empty($results)) {
+        error_log("No packages found in DB for $country, attempting to fetch from API or cache");
+        
+        // נסה לקבל ממטמון
+        $cache_key = 'AdPro_esim_packages_' . md5($country);
+        $cached_packages = get_transient($cache_key);
+        
+        if ($cached_packages !== false) {
+            error_log("Returning packages from cache");
+            return $cached_packages;
+        }
+        
+        // אם אין גם במטמון, נסה ישירות מה-API
+        return AdPro_esim_get_packages_from_api($country);
+    }
+    
+    // עיבוד התוצאות למבנה דומה למה שחזר מקבצי JSON
+    foreach ($results as $row) {
+        $package = [
+            'productId' => $row['product_id'],
+            'providerId' => $row['provider_id'],
+            'providerName' => $row['provider_name'],
+            'title' => $row['title'],
+            'retailPrice' => $row['retail_price'],
+            'currencyCode' => $row['currency_code'],
+            'countries' => json_decode($row['countries'], true) ?: [],
+            'productDetails' => json_decode($row['product_details'], true) ?: [],
+            // תוספת של שדות מעובדים לשמירת תאימות
+            'processed_data' => [
+                'data_limit' => $row['data_limit'],
+                'data_unit' => $row['data_unit'],
+                'validity_days' => $row['validity_days'],
+                'title' => $row['title']
+            ]
+        ];
+        
+        // סינון חבילות עם מגבלת מהירות
+        if (isset($package['productDetails']) && is_array($package['productDetails'])) {
+            $has_speed_limit = false;
+            
+            foreach ($package['productDetails'] as $detail) {
+                if ($detail['name'] === 'SPEED') {
+                    $speed_value = strtolower($detail['value']);
+                    
+                    if (stripos($speed_value, 'mbps') !== false || 
+                        $speed_value === 'limited' || 
+                        stripos($speed_value, '7') !== false) {
+                        $has_speed_limit = true;
+                        break;
+                    }
+                }
+            }
+            
+            if ($has_speed_limit) {
+                continue; // דלג על חבילות עם מגבלת מהירות
+            }
+        }
+        
+        // הוספת שדה עזר לעיגול מחירים
+        $original_price = $row['retail_price'];
+        $rounded_price = (float)AdPro_get_smart_display_price(floatval($original_price));
+        $display_price = AdPro_get_smart_display_price(floatval($original_price));
+        
+        $package['original_price'] = $original_price;
+        $package['display_price'] = $display_price;
+        $package['retailPrice'] = $rounded_price;
+        
+        $packages[] = $package;
+    }
+    
+    // מיון לפי מחיר
+    usort($packages, function($a, $b) {
+        return floatval($a['retailPrice']) - floatval($b['retailPrice']);
+    });
+    
+    // שמירה בקאש
+    $cache_key = 'AdPro_esim_packages_' . md5($country);
+    set_transient($cache_key, $packages, HOUR_IN_SECONDS);
+    
+    return $packages;
+}
+
+/**
+ * פונקציית גיבוי לקבלת חבילות מקבצי JSON
+ * זהה לפונקציה המקורית טרם השדרוג למסד נתונים
+ */
+function AdPro_esim_get_packages_from_json($country = '') {
     // אם ביקשו מדינה ספציפית
     if (!empty($country)) {
         // בדיקה אם יש קובץ ספציפי למדינה
@@ -266,7 +392,7 @@ function AdPro_esim_get_packages($country = '') {
                 // סינון חבילות עם מגבלת מהירות
                 $packages = AdPro_filter_speed_restricted_packages($packages);
                 // סינון חבילות כפולות - השאר רק את הזולות ביותר
-				$packages = AdPro_filter_duplicate_packages($packages);			
+                $packages = AdPro_filter_duplicate_packages($packages);            
                 // סינון ספקים מוסתרים
                 $hidden_providers = get_option('AdPro_hidden_providers', []);
                 if (!empty($hidden_providers)) {
@@ -276,24 +402,19 @@ function AdPro_esim_get_packages($country = '') {
                     $packages = array_values($packages);
                 }
                 // עיגול חכם של המחירים לתצוגה
-foreach ($packages as &$package) {
-    if (isset($package['retailPrice'])) {
-        // שמירת המחיר המקורי לפני העיגול למקרה שנצטרך אותו
-        $package['original_price'] = $package['retailPrice'];
-        
-        // עיגול המחיר בצורה חכמה - המרה למספר
-        $rounded_price = (float)AdPro_get_smart_display_price(floatval($package['retailPrice']));
-        $package['display_price'] = AdPro_get_smart_display_price(floatval($package['retailPrice']));
-        
-        // עדכון המחיר ב-package
-        $package['retailPrice'] = $rounded_price;
-    }
-}
-
-// סינון חבילות כפולות לאחר העיגול (אם צריך)
-$packages = AdPro_filter_duplicate_packages($packages);
-
-// החזרת החבילות המעודכנות
+                foreach ($packages as &$package) {
+                    if (isset($package['retailPrice'])) {
+                        // שמירת המחיר המקורי לפני העיגול למקרה שנצטרך אותו
+                        $package['original_price'] = $package['retailPrice'];
+                        
+                        // עיגול המחיר בצורה חכמה - המרה למספר
+                        $rounded_price = (float)AdPro_get_smart_display_price(floatval($package['retailPrice']));
+                        $package['display_price'] = AdPro_get_smart_display_price(floatval($package['retailPrice']));
+                        
+                        // עדכון המחיר ב-package
+                        $package['retailPrice'] = $rounded_price;
+                    }
+                }
                 return $packages;
             }
         }
@@ -323,7 +444,7 @@ $packages = AdPro_filter_duplicate_packages($packages);
                 // סינון חבילות עם מגבלת מהירות
                 $all_packages = AdPro_filter_speed_restricted_packages($all_packages);
                 // סינון חבילות כפולות - השאר רק את הזולות ביותר
-				$all_packages = AdPro_filter_duplicate_packages($all_packages);
+                $all_packages = AdPro_filter_duplicate_packages($all_packages);
                 // סינון ספקים מוסתרים
                 $hidden_providers = get_option('AdPro_hidden_providers', []);
                 if (!empty($hidden_providers)) {
@@ -338,9 +459,14 @@ $packages = AdPro_filter_duplicate_packages($packages);
         }
     }
     
-    error_log("No valid JSON data found, falling back to API/cache");
-    
-    // הקוד הישן כגיבוי...
+    // אם לא נמצאו קבצי JSON, ננסה לקבל ישירות מה-API
+    return AdPro_esim_get_packages_from_api($country);
+}
+
+/**
+ * פונקציית גיבוי לקבלת חבילות ישירות מה-API
+ */
+function AdPro_esim_get_packages_from_api($country = '') {
     // בדיקה אם יש במטמון
     $cache_key = 'AdPro_esim_packages_' . md5($country);
     $cached_packages = get_transient($cache_key);
@@ -388,6 +514,8 @@ $packages = AdPro_filter_duplicate_packages($packages);
         'timeout' => 30, // הגדל את זמן התגובה המקסימלי
     ];
 
+    error_log("Fetching packages directly from API: $api_url");
+
     // שלח את הבקשה ל-API
     $response = wp_remote_get($api_url, $args);
     
@@ -412,8 +540,8 @@ $packages = AdPro_filter_duplicate_packages($packages);
     
     // סינון חבילות עם מגבלת מהירות
     $packages = AdPro_filter_speed_restricted_packages($packages);
-	
-	    // סינון חבילות כפולות - השאר רק את הזולות ביותר
+    
+    // סינון חבילות כפולות - השאר רק את הזולות ביותר
     $packages = AdPro_filter_duplicate_packages($packages);
     
     // סינון ספקים שסומנו להסתרה
@@ -460,8 +588,16 @@ $packages = AdPro_filter_duplicate_packages($packages);
     
     // שמור במטמון וגם החזר
     set_transient($cache_key, $packages, 1 * HOUR_IN_SECONDS); // שמור במטמון לשעה
+    
+    error_log("Fetched and cached " . count($packages) . " packages from API");
     return $packages;
 }
+
+
+
+
+
+
 
 /**
  * פונקציה לסינון חבילות עם מגבלת מהירות
@@ -509,17 +645,58 @@ function AdPro_filter_speed_restricted_packages($packages) {
  * @return array|null פרטי החבילה או null אם לא נמצא
  */
 function AdPro_get_package_by_id($country, $package_id) {
-    // קבלת כל החבילות למדינה
-    $packages = AdPro_esim_get_packages($country);
+    global $wpdb;
     
-    // חיפוש החבילה לפי מזהה
-    foreach ($packages as $package) {
-        if (isset($package['productId']) && $package['productId'] === $package_id) {
-            return $package;
-        }
+    $table_packages = $wpdb->prefix . 'adpro_esim_packages';
+    
+    $sql = $wpdb->prepare(
+        "SELECT * FROM $table_packages WHERE product_id = %s",
+        $package_id
+    );
+    
+    // אם צוינה מדינה, הוסף גם אותה לתנאי
+    if (!empty($country)) {
+        $sql = $wpdb->prepare(
+            "SELECT * FROM $table_packages WHERE product_id = %s AND country_iso = %s",
+            $package_id, $country
+        );
     }
     
-    return null;
+    $row = $wpdb->get_row($sql, ARRAY_A);
+    
+    if (empty($row)) {
+        // אם לא נמצא, נסה לחפש בכל החבילות
+        $packages = AdPro_esim_get_packages($country);
+        
+        foreach ($packages as $package) {
+            if (isset($package['productId']) && $package['productId'] === $package_id) {
+                return $package;
+            }
+        }
+        
+        return null;
+    }
+    
+    // המרה למבנה הישן
+    $package = [
+        'productId' => $row['product_id'],
+        'providerId' => $row['provider_id'],
+        'providerName' => $row['provider_name'],
+        'title' => $row['title'],
+        'retailPrice' => $row['retail_price'],
+        'currencyCode' => $row['currency_code'],
+        'countries' => json_decode($row['countries'], true) ?: [],
+        'productDetails' => json_decode($row['product_details'], true) ?: [],
+        // תוספת של שדות מעובדים
+        'processed_data' => [
+            'data_limit' => $row['data_limit'],
+            'data_unit' => $row['data_unit'],
+            'validity_days' => $row['validity_days'],
+            'title' => $row['title']
+        ]
+    ];
+    
+    return $package;
 }
 
 /**
@@ -529,6 +706,8 @@ function AdPro_get_package_by_id($country, $package_id) {
  * @return array|boolean מערך עם המחיר והמטבע או false אם אין נתונים
  */
 function AdPro_get_min_price_for_country($country_iso) {
+    global $wpdb;
+    
     // בדיקה אם יש במטמון
     $cache_key = 'AdPro_min_price_' . $country_iso;
     $cached_price = get_transient($cache_key);
@@ -537,35 +716,28 @@ function AdPro_get_min_price_for_country($country_iso) {
         return $cached_price;
     }
     
-    // קבלת כל החבילות למדינה
-    $packages = AdPro_esim_get_packages($country_iso);
+    $table_packages = $wpdb->prefix . 'adpro_esim_packages';
     
-    if (empty($packages)) {
-        return false;
-    }
+    // קבל את המחיר הנמוך ביותר
+    $sql = $wpdb->prepare(
+        "SELECT MIN(retail_price) as min_price, currency_code 
+         FROM $table_packages 
+         WHERE country_iso = %s
+         GROUP BY currency_code
+         ORDER BY min_price ASC
+         LIMIT 1",
+        $country_iso
+    );
     
-    $min_price = PHP_FLOAT_MAX;
-    $currency = '';
+    $row = $wpdb->get_row($sql);
     
-    // חיפוש המחיר הנמוך ביותר
-    foreach ($packages as $package) {
-        if (isset($package['retailPrice']) && is_numeric($package['retailPrice'])) {
-            $price = floatval($package['retailPrice']);
-            
-            if ($price < $min_price) {
-                $min_price = $price;
-                $currency = isset($package['currencyCode']) ? $package['currencyCode'] : '';
-            }
-        }
-    }
-    
-    if ($min_price == PHP_FLOAT_MAX) {
+    if (!$row) {
         return false;
     }
     
     $result = [
-        'price' => $min_price,
-        'currency' => $currency
+        'price' => floatval($row->min_price),
+        'currency' => $row->currency_code
     ];
     
     // שמירה במטמון ל-3 שעות
@@ -617,11 +789,8 @@ function AdPro_validate_api_key() {
  * @return array מערך של רשתות סלולריות
  */
 function AdPro_get_product_networks($product_id) {
-	
-	    error_log('Requesting networks for product: ' . $product_id);
-// לוג פרטי הבקשה לדיבוג
-error_log('API URL: ' . $api_url);
-error_log('API Headers: ' . json_encode($args['headers']));
+    global $wpdb;
+    
     // בדיקה אם יש במטמון
     $cache_key = 'AdPro_product_networks_' . md5($product_id);
     $cached_networks = get_transient($cache_key);
@@ -630,20 +799,46 @@ error_log('API Headers: ' . json_encode($args['headers']));
     if ($cached_networks !== false && !isset($_GET['no_cache'])) {
         return $cached_networks;
     }
-
-    // קבל פרטי התחברות מהגדרות התוסף
+    
+    $table_networks = $wpdb->prefix . 'adpro_esim_networks';
+    
+    // בדוק אם יש רשתות במסד הנתונים
+    $sql = $wpdb->prepare(
+        "SELECT * FROM $table_networks WHERE product_id = %s",
+        $product_id
+    );
+    
+    $results = $wpdb->get_results($sql, ARRAY_A);
+    
+    if (!empty($results)) {
+        // המרה למבנה תואם API
+        $networks = [];
+        
+        foreach ($results as $row) {
+            $networks[] = [
+                'countryCode' => $row['country_iso'],
+                'brand' => $row['network_brand'],
+                'networkId' => $row['network_id'],
+                'is4G' => (bool)$row['is_4g'],
+                'is5G' => (bool)$row['is_5g']
+            ];
+        }
+        
+        // שמור במטמון וגם החזר
+        set_transient($cache_key, $networks, 12 * HOUR_IN_SECONDS);
+        return $networks;
+    }
+    
+    // אם אין רשתות במסד הנתונים, קבל מה-API
     $api_key = get_option('AdPro_api_key');
     $merchant_id = get_option('AdPro_merchant_id');
-
-    // וודא שיש פרטי התחברות
+    
     if (empty($api_key) || empty($merchant_id) || empty($product_id)) {
         return [];
     }
-
-    // בנה את כתובת ה-API
+    
     $api_url = 'https://api.mobimatter.com/mobimatter/api/v2/products/' . $product_id . '/networks';
-
-    // בנה את פרטי הבקשה
+    
     $args = [
         'headers' => [
             'Accept' => 'text/plain',
@@ -652,31 +847,47 @@ error_log('API Headers: ' . json_encode($args['headers']));
         ],
         'timeout' => 30,
     ];
-
-    // שלח את הבקשה ל-API
+    
     $response = wp_remote_get($api_url, $args);
     
-    // בדוק אם הייתה שגיאה
     if (is_wp_error($response)) {
         error_log('AdPro eSIM API Error (Networks): ' . $response->get_error_message());
         return [];
     }
-
-    // קבל את תוכן התגובה ופענח JSON
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
-
-    // בדוק שהתגובה תקינה
-    if (!isset($data['statusCode']) || $data['statusCode'] !== 200) {
+    
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    $data = json_decode($response_body, true);
+    
+    if ($response_code !== 200 || !isset($data['statusCode']) || $data['statusCode'] !== 200) {
         error_log('AdPro eSIM API Error (Networks): Invalid response - ' . json_encode($data));
         return [];
     }
-
+    
     // קבל את הרשתות מהתגובה
     $networks = isset($data['result']) ? $data['result'] : [];
     
+    // שמור את הרשתות גם במסד הנתונים
+    if (!empty($networks)) {
+        $table_networks = $wpdb->prefix . 'adpro_esim_networks';
+        
+        foreach ($networks as $network) {
+            $network_data = [
+                'product_id' => $product_id,
+                'country_iso' => $network['countryCode'],
+                'network_brand' => $network['brand'],
+                'network_id' => $network['networkId'],
+                'is_4g' => isset($network['is4G']) && $network['is4G'] ? 1 : 0,
+                'is_5g' => isset($network['is5G']) && $network['is5G'] ? 1 : 0,
+                'last_updated' => current_time('mysql')
+            ];
+            
+            $wpdb->insert($table_networks, $network_data);
+        }
+    }
+    
     // שמור במטמון וגם החזר
-    set_transient($cache_key, $networks, 12 * HOUR_IN_SECONDS); // שמור במטמון ל-12 שעות
+    set_transient($cache_key, $networks, 12 * HOUR_IN_SECONDS);
     return $networks;
 }
 

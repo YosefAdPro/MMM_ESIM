@@ -8,6 +8,359 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * הוספת כפתור עדכון ידני של חבילות בממשק הניהול
+ */
+function AdPro_add_manual_update_button() {
+    // תוסף להגדרות הקיימות
+    add_action('admin_footer', function() {
+        // בדוק שאנחנו בדף הנכון
+        if (!isset($_GET['page']) || $_GET['page'] !== 'AdPro-esim-settings') {
+            return;
+        }
+        ?>
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            // הוסף כפתור לסעיף "פעולות נוספות"
+            $('h2:contains("פעולות נוספות")').next('p').after(`
+                <p>
+                    <a href="#" id="update-esim-packages" class="button">
+                        עדכן חבילות eSIM מה-API
+                    </a>
+                    <span id="update-result"></span>
+                    <span class="description">מעדכן את כל החבילות הזמינות ממקור ה-API והספקים.</span>
+                </p>
+            `);
+            
+            // טיפול בלחיצה על הכפתור
+            $('#update-esim-packages').on('click', function(e) {
+                e.preventDefault();
+                
+                if (!confirm('האם אתה בטוח שברצונך לעדכן את כל חבילות ה-eSIM? זה עשוי לקחת זמן מה.')) {
+                    return;
+                }
+                
+                var $button = $(this);
+                var $result = $('#update-result');
+                
+                $button.prop('disabled', true).text('מעדכן...');
+                $result.html('<span style="color: #aaa;">מעדכן חבילות, אנא המתן...</span>');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'AdPro_manual_update_packages'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $result.html('<span style="color: green;">✓ החבילות עודכנו בהצלחה!</span>');
+                        } else {
+                            $result.html('<span style="color: red;">✗ שגיאה: ' + response.data + '</span>');
+                        }
+                        $button.prop('disabled', false).text('עדכן חבילות eSIM מה-API');
+                    },
+                    error: function() {
+                        $result.html('<span style="color: red;">✗ שגיאה בשליחת הבקשה</span>');
+                        $button.prop('disabled', false).text('עדכן חבילות eSIM מה-API');
+                    }
+                });
+            });
+        });
+        </script>
+        <?php
+    });
+    
+    // הוספת אג'קס לעדכון ידני
+    add_action('wp_ajax_AdPro_manual_update_packages', function() {
+        // בדיקת הרשאות
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('אין לך הרשאות לבצע פעולה זו');
+            return;
+        }
+        
+        // ניסיון לעדכן חבילות
+        $result = AdPro_manual_update_packages();
+        
+        if ($result) {
+            wp_send_json_success('החבילות עודכנו בהצלחה');
+        } else {
+            wp_send_json_error('אירעה שגיאה בעדכון החבילות. בדוק בלוג השגיאות לפרטים נוספים.');
+        }
+    });
+}
+
+
+// הפעלת הפונקציה
+add_action('admin_init', 'AdPro_add_manual_update_button');
+
+/**
+ * הוספת דף סטטיסטיקות מדינות וחבילות
+ */
+function AdPro_add_database_stats_page() {
+    add_submenu_page(
+        'AdPro-esim-settings',
+        'סטטיסטיקות מסד נתונים',
+        'סטטיסטיקות DB',
+        'manage_options',
+        'AdPro-esim-db-stats',
+        'AdPro_display_database_stats'
+    );
+}
+add_action('admin_menu', 'AdPro_add_database_stats_page', 35);
+
+/**
+ * הצגת סטטיסטיקות מסד הנתונים
+ */
+function AdPro_display_database_stats() {
+    global $wpdb;
+    
+    $table_packages = $wpdb->prefix . 'adpro_esim_packages';
+    $table_countries = $wpdb->prefix . 'adpro_esim_countries';
+    $table_networks = $wpdb->prefix . 'adpro_esim_networks';
+    
+    // בדיקה אם הטבלאות קיימות
+    $packages_table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_packages'") == $table_packages;
+    $countries_table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_countries'") == $table_countries;
+    $networks_table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_networks'") == $table_networks;
+    
+    // קבלת סטטיסטיקות
+    $packages_count = $packages_table_exists ? $wpdb->get_var("SELECT COUNT(*) FROM $table_packages") : 0;
+    $countries_count = $countries_table_exists ? $wpdb->get_var("SELECT COUNT(*) FROM $table_countries") : 0;
+    $active_countries_count = $countries_table_exists ? $wpdb->get_var("SELECT COUNT(*) FROM $table_countries WHERE has_packages = 1") : 0;
+    $networks_count = $networks_table_exists ? $wpdb->get_var("SELECT COUNT(*) FROM $table_networks") : 0;
+    
+    // סטטיסטיקות נוספות
+    $providers_count = $packages_table_exists ? $wpdb->get_var("SELECT COUNT(DISTINCT provider_id) FROM $table_packages") : 0;
+    $cheapest_package = $packages_table_exists ? $wpdb->get_row("SELECT * FROM $table_packages ORDER BY retail_price ASC LIMIT 1") : null;
+    $most_expensive_package = $packages_table_exists ? $wpdb->get_row("SELECT * FROM $table_packages ORDER BY retail_price DESC LIMIT 1") : null;
+    
+    // מדינות הכי פופולריות (עם הכי הרבה חבילות)
+    $popular_countries = $packages_table_exists ? $wpdb->get_results("
+        SELECT country_iso, COUNT(*) as packages_count 
+        FROM $table_packages 
+        GROUP BY country_iso 
+        ORDER BY packages_count DESC 
+        LIMIT 10
+    ") : [];
+    
+    // ספקים הכי פופולריים
+    $popular_providers = $packages_table_exists ? $wpdb->get_results("
+        SELECT provider_id, provider_name, COUNT(*) as packages_count 
+        FROM $table_packages 
+        GROUP BY provider_id 
+        ORDER BY packages_count DESC 
+        LIMIT 10
+    ") : [];
+    
+    // בדיקת זמן העדכון האחרון
+    $last_update = get_option('adpro_packages_last_update', 0);
+    $last_update_formatted = $last_update > 0 ? date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $last_update) : 'לא ידוע';
+    
+    ?>
+    <div class="wrap">
+        <h1>סטטיסטיקות מסד נתונים eSIM</h1>
+        
+        <?php if (!$packages_table_exists || !$countries_table_exists || !$networks_table_exists) : ?>
+            <div class="notice notice-error">
+                <p>אחת או יותר מטבלאות מסד הנתונים אינה קיימת. אנא בצע עדכון של התוסף או הפעל מחדש כדי ליצור את הטבלאות.</p>
+            </div>
+        <?php endif; ?>
+        
+        <div class="stats-summary" style="display: flex; gap: 20px; margin: 20px 0;">
+            <div class="stat-card" style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center;">
+                <h3>סה"כ חבילות</h3>
+                <div class="stat-value" style="font-size: 24px; font-weight: bold;"><?php echo number_format($packages_count); ?></div>
+            </div>
+            
+            <div class="stat-card" style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center;">
+                <h3>מדינות פעילות</h3>
+                <div class="stat-value" style="font-size: 24px; font-weight: bold;"><?php echo number_format($active_countries_count); ?> / <?php echo number_format($countries_count); ?></div>
+            </div>
+            
+            <div class="stat-card" style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center;">
+                <h3>רשתות סלולריות</h3>
+                <div class="stat-value" style="font-size: 24px; font-weight: bold;"><?php echo number_format($networks_count); ?></div>
+            </div>
+            
+            <div class="stat-card" style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center;">
+                <h3>ספקים</h3>
+                <div class="stat-value" style="font-size: 24px; font-weight: bold;"><?php echo number_format($providers_count); ?></div>
+            </div>
+        </div>
+        
+        <div class="notice notice-info" style="margin-top: 20px;">
+            <p><strong>עדכון אחרון:</strong> <?php echo esc_html($last_update_formatted); ?></p>
+        </div>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
+            <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h2>מדינות פופולריות</h2>
+                
+                <?php if (!empty($popular_countries)) : ?>
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th>מדינה</th>
+                                <th>מספר חבילות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($popular_countries as $country) : 
+                                // חיפוש שם המדינה לפי ISO
+                                $country_name = $country->country_iso;
+                                $countries_mapping = AdPro_get_countries_mapping();
+                                foreach ($countries_mapping as $hebrew => $data) {
+                                    if ($data['iso'] === $country->country_iso) {
+                                        $country_name = $hebrew;
+                                        break;
+                                    }
+                                }
+                            ?>
+                                <tr>
+                                    <td>
+                                        <?php if (!empty($country->country_iso)) : ?>
+                                            <img src="https://flagcdn.com/16x12/<?php echo strtolower($country->country_iso); ?>.png" alt="<?php echo esc_attr($country->country_iso); ?>" style="vertical-align: middle; margin-left: 5px;">
+                                        <?php endif; ?>
+                                        <?php echo esc_html($country_name); ?>
+                                    </td>
+                                    <td><?php echo number_format($country->packages_count); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else : ?>
+                    <p>אין נתונים זמינים.</p>
+                <?php endif; ?>
+            </div>
+            
+            <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h2>ספקים פופולריים</h2>
+                
+                <?php if (!empty($popular_providers)) : ?>
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th>ספק</th>
+                                <th>מספר חבילות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($popular_providers as $provider) : ?>
+                                <tr>
+                                    <td><?php echo esc_html($provider->provider_name); ?></td>
+                                    <td><?php echo number_format($provider->packages_count); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else : ?>
+                    <p>אין נתונים זמינים.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+        
+        <?php if ($cheapest_package && $most_expensive_package) : ?>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
+                <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h2>החבילה הזולה ביותר</h2>
+                    <p>
+                        <strong>מדינה:</strong> 
+                        <?php 
+                        $country_name = $cheapest_package->country_iso;
+                        foreach ($countries_mapping as $hebrew => $data) {
+                            if ($data['iso'] === $cheapest_package->country_iso) {
+                                $country_name = $hebrew;
+                                break;
+                            }
+                        }
+                        echo esc_html($country_name);
+                        ?>
+                    </p>
+                    <p><strong>ספק:</strong> <?php echo esc_html($cheapest_package->provider_name); ?></p>
+                    <p><strong>כותרת:</strong> <?php echo esc_html($cheapest_package->title); ?></p>
+                    <p><strong>נתונים:</strong> <?php echo esc_html($cheapest_package->data_limit . ' ' . $cheapest_package->data_unit); ?></p>
+                    <p><strong>תוקף:</strong> <?php echo esc_html($cheapest_package->validity_days . ' ימים'); ?></p>
+                    <p><strong>מחיר:</strong> <?php echo esc_html($cheapest_package->retail_price . ' ' . $cheapest_package->currency_code); ?></p>
+                </div>
+                
+                <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h2>החבילה היקרה ביותר</h2>
+                    <p>
+                        <strong>מדינה:</strong> 
+                        <?php 
+                        $country_name = $most_expensive_package->country_iso;
+                        foreach ($countries_mapping as $hebrew => $data) {
+                            if ($data['iso'] === $most_expensive_package->country_iso) {
+                                $country_name = $hebrew;
+                                break;
+                            }
+                        }
+                        echo esc_html($country_name);
+                        ?>
+                    </p>
+                    <p><strong>ספק:</strong> <?php echo esc_html($most_expensive_package->provider_name); ?></p>
+                    <p><strong>כותרת:</strong> <?php echo esc_html($most_expensive_package->title); ?></p>
+                    <p><strong>נתונים:</strong> <?php echo esc_html($most_expensive_package->data_limit . ' ' . $most_expensive_package->data_unit); ?></p>
+                    <p><strong>תוקף:</strong> <?php echo esc_html($most_expensive_package->validity_days . ' ימים'); ?></p>
+                    <p><strong>מחיר:</strong> <?php echo esc_html($most_expensive_package->retail_price . ' ' . $most_expensive_package->currency_code); ?></p>
+                </div>
+            </div>
+        <?php endif; ?>
+        
+        <div style="margin-top: 30px;">
+            <h2>פעולות תחזוקה</h2>
+            
+            <p>
+                <a href="#" id="update-packages-manually" class="button button-primary">עדכן חבילות מה-API</a>
+                <span id="update-status"></span>
+            </p>
+            
+            <script type="text/javascript">
+                jQuery(document).ready(function($) {
+                    $('#update-packages-manually').on('click', function(e) {
+                        e.preventDefault();
+                        
+                        if (!confirm('האם אתה בטוח שברצונך לעדכן את כל החבילות? פעולה זו תמשך זמן מה.')) {
+                            return;
+                        }
+                        
+                        var $button = $(this);
+                        var $status = $('#update-status');
+                        
+                        $button.prop('disabled', true).text('מעדכן...');
+                        $status.html('<span style="color: blue;">מעדכן חבילות, אנא המתן...</span>');
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'AdPro_manual_update_packages'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    $status.html('<span style="color: green;">✓ העדכון הסתיים בהצלחה!</span>');
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    $status.html('<span style="color: red;">✗ שגיאה: ' + response.data + '</span>');
+                                    $button.prop('disabled', false).text('עדכן חבילות מה-API');
+                                }
+                            },
+                            error: function() {
+                                $status.html('<span style="color: red;">✗ שגיאה בתקשורת עם השרת</span>');
+                                $button.prop('disabled', false).text('עדכן חבילות מה-API');
+                            }
+                        });
+                    });
+                });
+            </script>
+        </div>
+    </div>
+    <?php
+}
+
+/**
  * הוספת פריטי תפריט לניהול התוסף
  */
 function AdPro_esim_admin_menu() {

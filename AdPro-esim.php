@@ -70,6 +70,7 @@ add_action('plugins_loaded', function() {
     require_once plugin_dir_path(__FILE__) . 'includes/countries-mapping.php';
     require_once plugin_dir_path(__FILE__) . 'public/frontend.php';
     require_once plugin_dir_path(__FILE__) . 'includes/woocommerce-esim-integration.php';
+	require_once plugin_dir_path(__FILE__) . 'includes/database-tables.php';
     
     // טעינת קובץ האינטגרציה החדש עם תוסף iCount רשמי
     require_once plugin_dir_path(__FILE__) . 'includes/icount-integration.php';
