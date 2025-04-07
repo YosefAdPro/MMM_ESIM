@@ -247,8 +247,8 @@ function AdPro_get_smart_display_price($price) {
 
 
 /**
- * פונקציה לקבלת חבילות eSIM ממסד הנתונים לפי מדינה.
- * אם אין חבילות במסד הנתונים, מנסה לקרוא ישירות מה-API כגיבוי.
+ * פונקציה משופרת לקבלת חבילות eSIM ממסד הנתונים לפי מדינה.
+ * הפונקציה מחפשת חבילות שהמדינה מופיעה גם בשדה country_iso וגם בשדה countries
  * 
  * @param string $country קוד מדינה
  * @return array מערך של חבילות
@@ -278,11 +278,18 @@ function AdPro_esim_get_packages($country = '') {
         $hidden_providers_sql = $wpdb->prepare(" AND provider_id NOT IN ($placeholders) ", $hidden_providers);
     }
     
-    // שאילתה לפי מדינה אם צוינה
+    // שאילתה לפי מדינה אם צוינה - עם שינוי משמעותי שמחפש גם במערך countries
     if (!empty($country)) {
+        // הכנה של תבנית JSON לחיפוש בשדה countries
+        $country_pattern = "%\"$country\"%";
+        
+        // שאילתה משופרת שמחפשת גם בשדה country_iso וגם בתוך מערך countries
         $sql = $wpdb->prepare(
-            "SELECT * FROM $table_packages WHERE country_iso = %s $hidden_providers_sql ORDER BY retail_price ASC",
-            $country
+            "SELECT * FROM $table_packages 
+            WHERE (country_iso = %s OR countries LIKE %s) 
+            $hidden_providers_sql 
+            ORDER BY retail_price ASC",
+            $country, $country_pattern
         );
     } else {
         // שאילתה לכל החבילות
