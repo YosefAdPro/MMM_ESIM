@@ -64,7 +64,7 @@ add_action('plugins_loaded', function() {
     }
     
     // טעינת קבצי התוסף - רק אחרי ש-WooCommerce זמין
-    require_once plugin_dir_path(__FILE__) . 'includes/debugging.php';
+  
     require_once plugin_dir_path(__FILE__) . 'includes/admin-settings.php';
     require_once plugin_dir_path(__FILE__) . 'includes/api-handler.php';
     require_once plugin_dir_path(__FILE__) . 'includes/countries-mapping.php';
@@ -865,7 +865,7 @@ function AdPro_add_esim_purchase_to_user_meta($order_id) {
         ];
         
         add_user_meta($user_id, 'AdPro_esim_purchase', $purchase_data);
-        error_log('DEBUG - Added purchase data to user meta for order #' . $order_id);
+     //   error_log('DEBUG - Added purchase data to user meta for order #' . $order_id);
     }
 }
 add_action('woocommerce_order_status_completed', 'AdPro_add_esim_purchase_to_user_meta', 20);
