@@ -930,15 +930,16 @@ function AdPro_esim_country_content_page() {
                                         <th scope="row">תוכן מותאם:</th>
                                         <td>
                                             <?php
-                                            wp_editor(
-                                                $saved_content[$hebrew]['text'] ?? '',
-                                                'country_content_' . $country_key,
-                                                [
-                                                    'textarea_name' => 'country_content[' . esc_attr($hebrew) . '][text]',
-                                                    'textarea_rows' => 10,
-                                                    'media_buttons' => true,
-                                                ]
-                                            );
+                                            $safe_hebrew = sanitize_key($hebrew); // יוצר מחרוזת בטוחה לשימוש כמזהה
+wp_editor(
+    isset($saved_content[$hebrew]['text']) ? wp_kses_post($saved_content[$hebrew]['text']) : '',
+    'country_content_' . $safe_hebrew,
+    [
+        'textarea_name' => 'country_content[' . esc_attr($hebrew) . '][text]',
+        'textarea_rows' => 10,
+        'media_buttons' => true,
+    ]
+);
                                             ?>
                                         </td>
                                     </tr>
