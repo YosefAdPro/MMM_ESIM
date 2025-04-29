@@ -184,6 +184,7 @@ if ($country_data) {
                 <?php foreach ($packages as $package) : ?>
                     <!-- נוסיף מחלקה package-clickable לפתיחת המודאל -->
                     <div class="package package-clickable" data-package-id="<?php echo esc_attr($package['productId']); ?>">
+			echo '<div style="font-size: 10px; color: #999; margin-top: 5px;">מזהה: ' . esc_html($package['productId']) . '</div>';
                         <?php
                         // חילוץ נתוני החבילה
                         $package_title = '';
@@ -288,7 +289,7 @@ if (!empty($validity_days)) {
             </div>
         <?php endif; ?>
         
-       <?php /* if (isset($package['providerName'])) : ?>
+        <?php  /*if (isset($package['providerName'])) : ?>
             <div class="info-item">
                 <span class="info-label">ספק:</span>
                 <span class="info-value"><?php echo esc_html($package['providerName']); ?></span>

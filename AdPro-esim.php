@@ -68,6 +68,7 @@ add_action('plugins_loaded', function() {
     require_once plugin_dir_path(__FILE__) . 'includes/admin-settings.php';
     require_once plugin_dir_path(__FILE__) . 'includes/api-handler.php';
     require_once plugin_dir_path(__FILE__) . 'includes/countries-mapping.php';
+	require_once plugin_dir_path(__FILE__) . 'includes/shortcodes.php'; // הוסף שורה זו
     require_once plugin_dir_path(__FILE__) . 'public/frontend.php';
     require_once plugin_dir_path(__FILE__) . 'includes/woocommerce-esim-integration.php';
 	require_once plugin_dir_path(__FILE__) . 'includes/database-tables.php';

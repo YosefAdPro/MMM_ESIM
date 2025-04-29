@@ -508,6 +508,96 @@ function AdPro_redirect_to_icount_payment($order_id) {
 }
 add_action('woocommerce_thankyou', 'AdPro_redirect_to_icount_payment', 5);
 
+
+/**
+ * שליחת מייל ללקוח באמצעות API של מובימטר
+ * 
+ * @param WC_Order $order הזמנת WooCommerce
+ * @param string $mobimatter_order_id מזהה ההזמנה במובימטר
+ * @return bool האם השליחה הצליחה
+ */
+function AdPro_send_mobimatter_customer_email($order, $mobimatter_order_id) {
+    // קבלת פרטי API
+    $api_key = get_option('AdPro_api_key');
+    $merchant_id = get_option('AdPro_merchant_id');
+    
+    if (empty($api_key) || empty($merchant_id) || empty($mobimatter_order_id)) {
+        error_log('AdPro eSIM: Missing API details for email sending');
+        return false;
+    }
+    
+    // בניית URL לשליחת המייל
+    $api_url = 'https://api.mobimatter.com/mobimatter/api/v2/email';
+    
+    // קבלת פרטי לקוח
+    $customer_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+    $customer_email = $order->get_billing_email();
+    $customer_phone = $order->get_billing_phone();
+    $order_total = $order->get_total();
+    $currency = $order->get_currency();
+    $merchant_order_id = $order->get_id();
+    
+    // הכנת נתוני הבקשה
+    $email_data = [
+        'orderId' => $mobimatter_order_id,
+        'customer' => [
+            'id' => $merchant_order_id, // או מזהה אחר שרלוונטי למערכת שלך
+            'name' => $customer_name,
+            'email' => $customer_email,
+            'phone' => $customer_phone
+        ],
+        'amountCharged' => (float)$order_total,
+        'currency' => $currency,
+        'merchantOrderId' => (string)$merchant_order_id
+    ];
+    
+    // אם יש מייל נוסף שברצונך לשלוח אליו עותק
+    if (false) { // שנה ל-true אם אתה רוצה להוסיף עותק למייל נוסף
+        $email_data['customer']['ccEmail'] = 'yosef@adpronet.com'; // החלף במייל הרצוי
+    }
+    
+    // הגדרת בקשת ה-API
+    $args = [
+        'headers' => [
+            'Accept' => 'text/plain',
+            'merchantId' => $merchant_id,
+            'api-key' => $api_key,
+            'Content-Type' => 'application/json'
+        ],
+        'body' => json_encode($email_data),
+        'method' => 'POST',
+        'timeout' => 30
+    ];
+    
+    // שליחת הבקשה
+    $response = wp_remote_post($api_url, $args);
+    
+    // בדיקת תשובה
+    if (is_wp_error($response)) {
+        $error_message = $response->get_error_message();
+        $order->add_order_note('שגיאה בשליחת מייל ללקוח דרך מובימטר: ' . $error_message);
+        error_log('AdPro eSIM: Error sending customer email via MobiMatter: ' . $error_message);
+        return false;
+    }
+    
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    
+    if ($response_code !== 200) {
+        $error_message = isset(json_decode($response_body, true)['message']) 
+            ? json_decode($response_body, true)['message'] 
+            : 'קוד שגיאה: ' . $response_code;
+        
+        $order->add_order_note('שגיאה בשליחת מייל ללקוח דרך מובימטר: ' . $error_message);
+        error_log('AdPro eSIM: Error sending customer email via MobiMatter: ' . $error_message);
+        return false;
+    }
+    
+    // הוספת הערה להזמנה
+    $order->add_order_note('נשלח מייל ללקוח דרך מובימטר בהצלחה');
+    return true;
+}
+
 /**
  * טיפול בתשובה מ-iCount
  */
@@ -535,9 +625,11 @@ function AdPro_handle_icount_callback() {
             $merchant_id = get_option('AdPro_merchant_id');
             
             $api_url = 'https://api.mobimatter.com/mobimatter/api/v2/order/complete';
-            
+			$customer_email = $order->get_billing_email();
+
             $complete_data = [
-                'id' => $mobimatter_order_id
+                'id' => $mobimatter_order_id,
+				'notes' => $customer_email
             ];
             
             $args = [
@@ -592,6 +684,9 @@ function AdPro_handle_icount_callback() {
             // עדכון סטטוס ההזמנה
             $order->update_status('completed', 'ההזמנה הושלמה בהצלחה במובימטר');
             $order->save();
+			
+			    // שליחת מייל ללקוח דרך מובימטר
+			AdPro_send_mobimatter_customer_email($order, $mobimatter_order_id);
             
             // שליחת מייל ללקוח עם פרטי ה-eSIM
             AdPro_send_esim_details_email($order_id);

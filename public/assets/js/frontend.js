@@ -1,5 +1,48 @@
 jQuery(document).ready(function ($) {
     console.log('Script loaded successfully');
+	
+	
+
+
+    // תמיכה בסינון צף
+    if ($('.package-filters').length) {
+        // מוסיף את ה-sticky class מיד לאלמנט אם המשתמש במובייל
+        if (window.innerWidth <= 768) {
+            $('.package-filters').addClass('sticky');
+        } else {
+            // במסך רגיל, מחשב את המיקום וצף בהתאם לגלילה
+            const filterOffset = $('.package-filters').offset().top;
+            
+            $(window).on('scroll', function() {
+                const scrollDistance = $(window).scrollTop();
+                
+                if (scrollDistance > filterOffset) {
+                    $('.package-filters').addClass('sticky');
+                } else {
+                    $('.package-filters').removeClass('sticky');
+                }
+            });
+        }
+        
+        // עדכון בעת שינוי גודל חלון
+        $(window).on('resize', function() {
+            if (window.innerWidth <= 768) {
+                $('.package-filters').addClass('sticky');
+            } else {
+                // בדוק שוב את מיקום הגלילה
+                const filterOffset = $('.package-filters').offset().top;
+                const scrollDistance = $(window).scrollTop();
+                
+                if (scrollDistance > filterOffset) {
+                    $('.package-filters').addClass('sticky');
+                } else {
+                    $('.package-filters').removeClass('sticky');
+                }
+            }
+        });
+    }
+
+
 
     // ניהול סינון במובייל
     function toggleMobileFilters() {

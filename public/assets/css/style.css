@@ -289,27 +289,33 @@ body {
    ================================= */
 .package-filters {
     background-color: white;
-    padding: 25px;
+    padding: 15px;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     position: sticky;
-    top: 20px;
+    top: 0; /* לשינוי מ-20px ל-0 כדי שיהיה צמוד לחלק העליון */
     z-index: 100;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.package-filters.sticky {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
 }
 
 .package-filters h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
+    margin: 0;
+    margin-bottom: 10px;
+    display: inline-block;
+    font-size: 1.2rem;
     color: var(--primary-color);
-    font-size: 1.4rem;
-    font-weight: 600;
 }
 
 .filter-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-wrap: nowrap;
+    gap: 10px;
     align-items: center;
 }
 
@@ -323,83 +329,34 @@ body {
     display: block; /* מוצג בברירת מחדל בדסקטופ */
 }
 
-@media (max-width: 768px) {
-	
-	    .package-info-row {
-        gap: 10px;
-    }
-    
-    .package-details {
-        padding: 10px;
-    }
-    .filter-mobile-toggle {
-        display: block; /* מוצג במובייל */
-        width: 100%;
-        padding: 10px 15px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        text-align: center;
-        margin-bottom: 10px;
-        transition: var(--transition);
-    }
-    
-    .filter-mobile-toggle:hover {
-        background-color: #0055b3;
-    }
-    
-    .filter-content {
-        display: none; /* מוסתר בברירת מחדל במובייל */
-    }
-    
-    .package-filters.filters-open .filter-content {
-        display: block !important; /* מוצג כאשר יש קלאס filters-open - עם !important להגברת עדיפות */
-    }
-	
-	/* בטלפונים נשאר בתצוגה דו-טורית */
 
-    .country-flag-name {
-        font-size: 12px;
-    }
-    
-    .country-cell {
-        padding: 5px;
-    }
-    
-    .country-flag-name img {
-        width: 20px;
-        height: 15px;
-    }
-}
 
 .filter-group {
     flex: 1;
-    min-width: 200px;
+    min-width: 0; /* אפשר לאלמנטים להתכווץ מתחת לmin-width הטבעי שלהם */
 }
 
 .filter-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     font-weight: 600;
     color: var(--dark-gray);
+    font-size: 0.85rem;
 }
 
 select {
     width: 100%;
-    padding: 12px 15px;
+    padding: 8px 10px;
     border: 1px solid var(--light-gray);
     border-radius: 8px;
     background-color: white;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: var(--transition);
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: left 15px center;
-    background-size: 14px;
+    background-position: left 10px center;
+    background-size: 12px;
 }
 
 select:hover, 
@@ -410,7 +367,7 @@ select:focus {
 }
 
 .reset-button {
-    padding: 12px 25px;
+    padding: 8px 15px;
     background-color: var(--light-gray);
     color: var(--dark-gray);
     border: none;
@@ -418,6 +375,15 @@ select:focus {
     cursor: pointer;
     font-weight: 600;
     transition: var(--transition);
+    white-space: nowrap;
+    margin-top: 19px; /* יישור עם שאר האלמנטים */
+}
+
+.filter-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .reset-button:hover {
@@ -1232,14 +1198,32 @@ select:focus {
 }
 
 /* =================================
-   התאמות למובייל
+   התאמות למובייל - קוד מאוחד
    ================================= */
-   /* Sticky Filter Button Styles - מוסתר בברירת מחדל */
+   
+/* כפתור סינון צף - מוסתר בדסקטופ */
 .sticky-filter-button {
     display: none;
 }
    
 @media (max-width: 768px) {
+    /* התאמות כלליות */
+    .country-header h1 {
+        font-size: 1.8rem;
+        gap: 10px;
+    }
+    
+    .country-header h1 img {
+        width: 36px;
+        height: 27px;
+    }
+    
+    .country-custom-content, 
+    .country-default-content {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
     /* התאמת אזור החיפוש */
     .search-container {
         padding: 15px 10px;
@@ -1251,17 +1235,15 @@ select:focus {
         margin-bottom: 15px;
     }
     
-    /* התאמת שדה החיפוש */
     .search-box {
         max-width: 100%;
     }
     
     #country-search {
         padding: 10px 15px;
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
     
-    /* התאמת מקסימום גובה לתיבת ההצעות */
     #country-suggestions {
         max-height: 200px;
     }
@@ -1286,23 +1268,33 @@ select:focus {
         font-size: 0.8rem;
     }
     
-    /* סינון חבילות במובייל */
+    /* התאמות לפילטר חבילות במובייל */
     .package-filters {
-        padding: 15px;
-        position: relative;
-        z-index: 50;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 999;
     }
     
     .package-filters h3 {
-        font-size: 1.2rem;
-        margin-bottom: 12px;
+        font-size: 1rem;
+        margin-bottom: 8px;
     }
     
-    /* הצגת כפתור הפעלת סינון במובייל */
+    /* עדכון מבנה כותרת הפילטר */
+    .filter-title-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
     .filter-mobile-toggle {
         display: block;
         width: 100%;
-        padding: 10px 15px;
+        padding: 8px 12px;
         background-color: var(--primary-color);
         color: white;
         border: none;
@@ -1310,54 +1302,118 @@ select:focus {
         font-weight: 600;
         cursor: pointer;
         text-align: center;
-        margin-bottom: 10px;
-        transition: var(--transition);
+        margin-bottom: 8px;
+        font-size: 0.9rem;
     }
     
     .filter-mobile-toggle:hover {
         background-color: #0055b3;
     }
     
-    /* הסתרת תוכן הסינון בברירת מחדל */
     .filter-content {
-        display: none;
+        display: none; /* מוסתר בברירת מחדל במובייל */
     }
     
-    /* הצגת תוכן הסינון כאשר הוא פתוח */
-    .filters-open .filter-content {
-        display: block;
+    .package-filters.filters-open .filter-content {
+        display: block !important;
     }
     
-    /* התאמת שורת הסינון */
     .filter-row {
-        flex-direction: column;
+        display: flex;
+        flex-wrap: nowrap; /* מונע שבירת שורה */
+        overflow-x: auto; /* מאפשר גלילה אופקית */
+        padding-bottom: 10px; /* מרווח לסרגל גלילה */
+        -webkit-overflow-scrolling: touch; /* גלילה חלקה במכשירי אפל */
+        scrollbar-width: thin; /* סרגל גלילה דק בדפדפנים תומכים */
+        white-space: nowrap; /* מונע שבירת שורה של תוכן */
         gap: 10px;
+        margin-bottom: 5px;
+    }
+	
+	    /* מסתיר את סרגל הגלילה בכמה דפדפנים אבל משאיר את הפונקציונליות */
+    .filter-row::-webkit-scrollbar {
+        height: 4px;
+    }
+    
+    .filter-row::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
     }
     
     .filter-group {
-        width: 100%;
-        margin-bottom: 12px;
+        flex: 0 0 auto; /* אינו מתרחב או מתכווץ, נשאר בגודלו הטבעי */
+        width: auto;
+        min-width: 120px; /* רוחב מינימלי לכל קבוצת פילטר */
+        margin-bottom: 0; /* ביטול מרווח תחתון */
+    }
+	
+    .filter-group label {
+        font-size: 0.8rem;
+        margin-bottom: 3px;
     }
     
     select {
-        padding: 10px;
+        width: 100%;
+        min-width: 120px;
     }
     
     .reset-button {
-        width: 100%;
-        margin-top: 10px;
+        flex: 0 0 auto;
+        width: auto;
+        margin-top: 0;
+        white-space: nowrap;
+        align-self: flex-end; /* יישור לתחתית כדי להיות באותו גובה עם הבחירות */
+    }
+	
+    /* כפתור סינון צף במובייל */
+    .sticky-filter-button {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        right: 15px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 1010;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
     }
     
-    /* התאמת חבילות */
-    .packages-list {
+    .sticky-filter-button.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    
+    .sticky-filter-button:hover {
+        background-color: #0055b3;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+    
+    /* התאמות לרשימת חבילות */
+    .packages-list,
+    .packages-grid {
         grid-template-columns: 1fr;
         gap: 15px;
     }
     
-    /* חבילות קטנות יותר במובייל */
-    .package {
-        max-height: none;
-        margin-bottom: 15px;
+    .package,
+    .package-card {
+        margin-bottom: 12px;
+    }
+    
+    .package-info-row {
+        gap: 8px;
+        flex-wrap: wrap;
     }
     
     .package h2 {
@@ -1368,37 +1424,45 @@ select:focus {
     }
     
     .package-details {
-        padding: 12px;
+        padding: 10px;
     }
     
     .price {
         font-size: 1.6rem;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     
-    .data, .validity, .provider, .data-validity {
-        margin: 8px 0;
-        font-size: 0.85rem;
-        gap: 5px;
+    .card-price {
+        font-size: 1.5rem;
     }
     
-    .data strong, .validity strong, .provider strong, .data-validity strong {
-        min-width: 60px;
+    .card-title {
+        font-size: 0.95rem;
     }
     
-    .package-description {
-        margin-top: 10px;
-        padding-top: 10px;
-        font-size: 0.8rem;
+    .card-body {
+        padding: 10px;
+        gap: 8px;
+    }
+    
+    .card-specs {
+        gap: 8px;
+    }
+    
+    .spec-item {
+        padding: 4px 8px;
+        font-size: 11px;
     }
     
     /* רשתות וארצות נתמכות - תצוגה קומפקטית */
-    .country-networks, .supported-countries {
+    .country-networks, 
+    .supported-countries {
         margin-top: 10px;
-        padding: 10px;
+        padding: 8px;
     }
     
-    .country-networks h3, .supported-countries h3 {
+    .country-networks h3, 
+    .supported-countries h3 {
         font-size: 0.9rem;
         margin-bottom: 8px;
     }
@@ -1408,8 +1472,12 @@ select:focus {
         gap: 5px;
     }
     
+    .networks-row {
+        gap: 4px;
+    }
+    
     .network-item {
-        padding: 5px;
+        padding: 4px;
     }
     
     .network-name {
@@ -1422,68 +1490,30 @@ select:focus {
     
     .buy-now {
         padding: 12px;
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
     
     /* התאמות מודאל */
     .modal-content {
         padding: 15px;
         width: 95%;
+        margin: 15% auto;
     }
     
     #package-modal-content h2 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         margin-bottom: 15px;
     }
     
-    /* התאמות לאזור האישי */
-    .esim-packages-list {
-        grid-template-columns: 1fr;
+    .modal-details {
+        gap: 15px;
     }
     
-    .esim-package-details {
-        flex-direction: column;
+    .countries-supported-grid {
+        max-height: 250px;
     }
     
-    .esim-package-qr {
-        order: -1;
-        margin-bottom: 15px;
-    }
-	/* תוספת הכפתור הצף */
-.sticky-filter-button {
-    display: block;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 15px;
-    font-weight: 600;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1010; /* גבוה יותר מהמודאל (1000) */
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(20px);
-}
-
-    .sticky-filter-button.visible {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    .sticky-filter-button:hover {
-        background-color: #0055b3;
-        transform: translateY(-5px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-    }
-	
-	/* בטלפונים נשאר בתצוגה דו-טורית */
-
+    /* התאמות לרשימת מדינות במודאל */
     .country-flag-name {
         font-size: 12px;
     }
@@ -1496,8 +1526,25 @@ select:focus {
         width: 20px;
         height: 15px;
     }
+    
+    /* התאמות לאזור האישי */
+    .esim-packages-list {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .esim-package-details {
+        flex-direction: column;
+        padding: 15px;
+    }
+    
+    .esim-package-qr {
+        order: -1;
+        margin-bottom: 10px;
+    }
 }
 
+/* התאמות למסכים קטנים במיוחד */
 @media (max-width: 380px) {
     .country-grid {
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
@@ -1512,14 +1559,30 @@ select:focus {
         font-size: 0.75rem;
     }
     
-    .package h2 {
-        font-size: 0.9rem;
+    .filter-group {
+        flex: 100%; /* בקרן קטן מאוד כל אלמנט בשורה חדשה */
     }
-	/* התאמות לכפתור הצף במסכים קטנים */
+    
+    .package h2,
+    .card-title {
+        font-size: 0.85rem;
+    }
+    
+    .price,
+    .card-price {
+        font-size: 1.4rem;
+    }
+    
     .sticky-filter-button {
         right: 10px;
         bottom: 15px;
-        padding: 8px 12px;
-        font-size: 0.9rem;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .spec-item {
+        font-size: 10px;
+        padding: 3px 6px;
     }
 }
+
