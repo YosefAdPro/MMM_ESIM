@@ -41,8 +41,14 @@ function AdPro_ajax_reprocess_esim_order() {
     }
     
     $order_id = intval($_POST['order_id']);
+    $order = wc_get_order($order_id);
     
-    // שימוש בפונקציה החדשה
+    if (!$order) {
+        wp_send_json_error('הזמנה לא נמצאה');
+        return;
+    }
+    
+    // הפעלת תהליך עיבוד מחדש
     $result = AdPro_process_complete_esim_order($order_id);
     
     if ($result) {
