@@ -885,3 +885,70 @@ function AdPro_flush_all_rules() {
 register_deactivation_hook(__FILE__, function() {
     flush_rewrite_rules();
 });
+
+/**
+ * אינטגרציה עם Elementor - הוסף בסוף קובץ AdPro-esim.php
+ */
+
+// בדיקה אם Elementor מותקן ופעיל
+function AdPro_esim_check_elementor() {
+    if (!did_action('elementor/loaded')) {
+        add_action('admin_notices', function() {
+            echo '<div class="notice notice-warning"><p>AdPro eSIM: Elementor לא מותקן או לא פעיל.</p></div>';
+        });
+        return false;
+    }
+    return true;
+}
+
+// רישום הווידג'ט
+function AdPro_esim_register_elementor_widgets($widgets_manager) {
+    // ודא שהקובץ קיים
+    $widget_file = ADPRO_ESIM_PATH . 'includes/elementor-widget.php';
+    
+    if (!file_exists($widget_file)) {
+        error_log('AdPro eSIM: Elementor widget file not found: ' . $widget_file);
+        return;
+    }
+    
+    // טען את הקובץ
+    require_once $widget_file;
+    
+    // בדוק שהמחלקה קיימת
+    if (!class_exists('AdPro_eSIM_Elementor_Widget')) {
+        error_log('AdPro eSIM: Elementor widget class not found');
+        return;
+    }
+    
+    // רשום את הווידג'ט
+    $widgets_manager->register(new \AdPro_eSIM_Elementor_Widget());
+    
+    error_log('AdPro eSIM: Elementor widget registered successfully');
+}
+
+// הוספת קטגוריה מותאמת
+function AdPro_esim_add_elementor_widget_categories($elements_manager) {
+    $elements_manager->add_category(
+        'adpro-esim',
+        [
+            'title' => 'AdPro eSIM',
+            'icon' => 'fa fa-plug',
+        ]
+    );
+}
+
+// רישום האירועים
+function AdPro_esim_init_elementor() {
+    if (!AdPro_esim_check_elementor()) {
+        return;
+    }
+    
+    // רישום הווידג'ט
+    add_action('elementor/widgets/register', 'AdPro_esim_register_elementor_widgets');
+    
+    // הוספת קטגוריה
+    add_action('elementor/elements/categories_registered', 'AdPro_esim_add_elementor_widget_categories');
+}
+
+// הפעלה
+add_action('init', 'AdPro_esim_init_elementor');
