@@ -72,6 +72,9 @@ add_action('plugins_loaded', function() {
     require_once plugin_dir_path(__FILE__) . 'public/frontend.php';
     require_once plugin_dir_path(__FILE__) . 'includes/woocommerce-esim-integration.php';
 	require_once plugin_dir_path(__FILE__) . 'includes/database-tables.php';
+
+
+
     
     // טעינת קובץ האינטגרציה החדש עם תוסף iCount רשמי
     require_once plugin_dir_path(__FILE__) . 'includes/icount-integration.php';
@@ -84,6 +87,15 @@ add_action('plugins_loaded', function() {
 /**
  * הוספת כללי שכתוב לניתובים מותאמים
  */
+
+
+// השאר את זה - צריך לתפריט של אלמנטור:
+function AdPro_esim_query_vars($vars) {
+    $vars[] = 'AdPro_esim_country';
+    return $vars;
+}
+add_filter('query_vars', 'AdPro_esim_query_vars');
+
 function AdPro_esim_rewrite_rule() {
     add_rewrite_rule(
         '^esim/([^/]+)/?$',
@@ -93,29 +105,6 @@ function AdPro_esim_rewrite_rule() {
 }
 add_action('init', 'AdPro_esim_rewrite_rule');
 
-function AdPro_esim_query_vars($vars) {
-    $vars[] = 'AdPro_esim_country';
-    return $vars;
-}
-add_filter('query_vars', 'AdPro_esim_query_vars');
-
-function AdPro_esim_template_include($template) {
-    if (get_query_var('AdPro_esim_country')) {
-        $country_param = strtolower(get_query_var('AdPro_esim_country'));
-        if (isset($_GET['success'])) {
-            return plugin_dir_path(__FILE__) . 'public/success-template.php';
-        }
-        if (isset($_GET['error'])) {
-            return plugin_dir_path(__FILE__) . 'public/error-template.php';
-        }
-        $template_path = plugin_dir_path(__FILE__) . 'public/esim-country-template.php';
-        if (file_exists($template_path)) {
-            return $template_path;
-        }
-    }
-    return $template;
-}
-add_filter('template_include', 'AdPro_esim_template_include');
 
 function AdPro_register_esim_endpoints() {
     add_rewrite_endpoint('esim-add-to-cart', EP_ROOT);
@@ -952,3 +941,196 @@ function AdPro_esim_init_elementor() {
 
 // הפעלה
 add_action('init', 'AdPro_esim_init_elementor');
+
+/**
+ * Integration with Elementor Pro Theme Builder
+ */
+function AdPro_elementor_theme_builder_integration() {
+    // רק אם אלמנטור פרו פעיל
+    if (!defined('ELEMENTOR_PRO_VERSION')) {
+        return;
+    }
+    
+    // הוסף support לתבניות דינמיות
+    add_theme_support('elementor-theme-builder');
+    
+    // רשום custom location לדפי eSIM
+    add_action('elementor/theme/register_locations', 'AdPro_register_elementor_locations');
+}
+add_action('after_setup_theme', 'AdPro_elementor_theme_builder_integration');
+
+/**
+ * רישום מיקומים מותאמים באלמנטור
+ */
+function AdPro_register_elementor_locations($elementor_theme_manager) {
+    $elementor_theme_manager->register_location('esim_country_page', [
+        'label' => 'eSIM Country Page',
+        'multiple' => false,
+        'edit_in_content' => true,
+    ]);
+}
+
+/**
+ * בדיקה אם יש תבנית אלמנטור לדף eSIM
+ */
+function AdPro_maybe_use_elementor_template() {
+    // רק בדפי eSIM
+    if (get_query_var('AdPro_esim_country')) {
+        $document = \Elementor\Plugin::$instance->documents->get_current();
+        
+        if ($document && $document->get_settings('location') === 'esim_country_page') {
+            // יש תבנית אלמנטור - נשתמש בה
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * טעינת הווידג'ט החדש לאלמנטור
+ */
+function AdPro_register_new_elementor_widgets($widgets_manager) {
+    require_once ADPRO_ESIM_PATH . 'includes/elementor-esim-country-widget.php';
+    $widgets_manager->register(new \AdPro_eSIM_Country_Widget());
+}
+add_action('elementor/widgets/register', 'AdPro_register_new_elementor_widgets');
+
+
+
+
+
+/**
+ * אינטגרציה ידנית עם תבנית אלמנטור
+ */
+
+// הוסף אפשרות להגדיר מזהה תבנית באדמין
+function AdPro_add_elementor_template_setting() {
+    add_settings_field(
+        'AdPro_elementor_template_id',
+        'מזהה תבנית אלמנטור לדפי מדינות',
+        'AdPro_elementor_template_field_callback',
+        'AdPro-esim-settings',
+        'AdPro_esim_api_section'
+    );
+    
+    register_setting('AdPro_esim_api_settings', 'AdPro_elementor_template_id');
+}
+add_action('admin_init', 'AdPro_add_elementor_template_setting');
+
+function AdPro_elementor_template_field_callback() {
+    $template_id = get_option('AdPro_elementor_template_id', '');
+    echo "<input type='number' name='AdPro_elementor_template_id' value='" . esc_attr($template_id) . "' class='regular-text'>";
+    echo "<p class='description'>הזן את מזהה התבנית שיצרת באלמנטור (נמצא ב-URL בעת עריכה)</p>";
+}
+
+// החלפת התבנית המקורית בתבנית אלמנטור
+function AdPro_use_elementor_template_for_country_pages($template) {
+    // בדוק אם זה דף מדינת eSIM
+    if (get_query_var('AdPro_esim_country')) {
+        $elementor_template_id = get_option('AdPro_elementor_template_id');
+        
+        if (!empty($elementor_template_id) && defined('ELEMENTOR_VERSION')) {
+            // בדוק שהתבנית קיימת
+            $template_post = get_post($elementor_template_id);
+            
+            if ($template_post && $template_post->post_type === 'elementor_library') {
+                // יצור תבנית זמנית שתציג את תבנית האלמנטור
+                $temp_template = ADPRO_ESIM_PATH . 'public/elementor-country-template.php';
+                
+                if (!file_exists($temp_template)) {
+                    AdPro_create_elementor_template_file($temp_template, $elementor_template_id);
+                }
+                
+                return $temp_template;
+            }
+        }
+    }
+    
+    return $template;
+}
+add_filter('template_include', 'AdPro_use_elementor_template_for_country_pages', 99);
+
+// יצירת קובץ תבנית זמני
+function AdPro_create_elementor_template_file($file_path, $template_id) {
+    $template_content = '<?php
+get_header();
+
+// טען את תבנית האלמנטור
+if (class_exists(\'\Elementor\Frontend\')) {
+    echo \Elementor\Plugin::$instance->frontend->get_builder_content(' . intval($template_id) . ');
+} else {
+    echo "<p>שגיאה: אלמנטור לא זמין</p>";
+}
+
+get_footer();
+';
+    
+    file_put_contents($file_path, $template_content);
+}
+
+// הוסף JavaScript לעורך אלמנטור לזיהוי נכון של דפי eSIM
+function AdPro_elementor_editor_scripts() {
+    if (isset($_GET['elementor-preview']) && !empty($_GET['elementor-preview'])) {
+        ?>
+        <script>
+        // סימולציה של דף eSIM בעורך אלמנטור
+        if (typeof AdPro_esim_ajax === 'undefined') {
+            window.AdPro_esim_ajax = {
+                site_url: '<?php echo home_url(); ?>',
+                countries: <?php echo json_encode(AdPro_get_countries_mapping()); ?>
+            };
+        }
+        
+        // הוסף פרמטר מדינה לדוגמה בעורך
+        if (typeof URLSearchParams !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has('AdPro_esim_country')) {
+                // סט פרמטר דיפולטיבי לתצוגה בעורך
+                window.AdPro_current_country = 'israel';
+            }
+        }
+        </script>
+        <?php
+    }
+}
+add_action('wp_head', 'AdPro_elementor_editor_scripts');
+
+// הוסף תמיכה בקוד קצר גם בתבניות אלמנטור
+function AdPro_elementor_country_shortcode($atts) {
+    $atts = shortcode_atts([
+        'country' => get_query_var('AdPro_esim_country'),
+        'show_header' => 'yes',
+        'show_filter' => 'yes',
+    ], $atts);
+    
+    if (empty($atts['country'])) {
+        return '<p>לא נמצא פרמטר מדינה</p>';
+    }
+    
+    // שימוש בווידג'ט הקיים
+    if (class_exists('AdPro_eSIM_Country_Widget')) {
+        $widget = new AdPro_eSIM_Country_Widget();
+        
+        // הגדרת ההגדרות
+        $widget->set_settings([
+            'show_country_header' => $atts['show_header'],
+            'show_packages_filter' => $atts['show_filter'],
+            'custom_title_template' => 'חבילות eSIM עבור {country}',
+            'show_country_flag' => 'yes',
+            'show_country_content' => 'yes',
+            'fallback_content' => 'גלה את חבילות ה-eSIM הטובות ביותר ל{country}.',
+            'packages_layout' => 'grid',
+            'packages_columns' => '3',
+            'packages_limit' => 20,
+            'show_package_networks' => 'yes',
+            'show_supported_countries' => 'yes',
+        ]);
+        
+        ob_start();
+        $widget->render();
+        return ob_get_clean();
+    }
+    
+return '<p>שגיאה: ווידגט לא זמין</p>';}
+add_shortcode('esim_country_page', 'AdPro_elementor_country_shortcode');
+
